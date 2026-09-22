@@ -1,0 +1,14 @@
+# Virtuelle Python-Umgebung und Caches
+.venv/
+__pycache__/
+*.pyc
+
+# Archivierter Arduino-Uno-Stand (nicht Teil des ESP32-Repositories)
+software/
+
+# Laufzeit- und Zustandsdateien des PC-Bedienfelds
+esp32SolarTracker/pc/einstellungen.json
+esp32SolarTracker/pc/einstellungen_vor_*.json
+esp32SolarTracker/pc/betrieb.json
+esp32SolarTracker/pc/*.tmp
+esp32SolarTracker/pc/design1_pruefung*.png
