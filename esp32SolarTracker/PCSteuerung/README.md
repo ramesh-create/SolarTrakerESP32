@@ -1,7 +1,15 @@
-# ESP32-PCSteuerung 0.6.0
+# ESP32-PCSteuerung 0.6.1
 
-Stand: 21.09.2026. Eigenstaendige Firmware fuer das [Python-Bedienfeld](../pc/README.md).
+Stand: 22.09.2026. Eigenstaendige Firmware fuer das [Python-Bedienfeld](../pc/README.md).
 Kein automatischer Motorstart; die Hauptsoftware bleibt separat erhalten.
+
+## Stand 0.6.1 (22.09.2026)
+
+Live-LCD zeigt jetzt **Datum und lokale Zeit**: Zeile 1 `TT.MM.JJ HH:MM`
+(lokal, MEZ/MESZ). Zeile 2 wechselt alle 3 s zwischen Winkeln
+(`Az### Ng##`) und Status (`Autonom`/`PC-Bereit`/`Bereit`); waehrend einer Fahrt
+steht dort die Aktion. Kalenderberechnung ueber `kalenderZeit` in `Sonne`.
+Protokoll 3, margin=114, Fahrlogik und Speicher unveraendert.
 
 ## Stand 0.6.0 (21.09.2026)
 

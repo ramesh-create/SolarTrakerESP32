@@ -36,6 +36,17 @@ def sonnenfenster(tag, breite, laenge):
     return auf, unter
 
 
+def aktuelles_sonnenfenster(jetzt, breite, laenge):
+    """Sonnenfenster fuer jetzt; nach Sonnenuntergang das des Folgetags.
+
+    So kann die Simulation auch nachts immer starten (naechster Sonnentag).
+    """
+    auf, unter = sonnenfenster(jetzt, breite, laenge)
+    if jetzt >= unter:
+        auf, unter = sonnenfenster(jetzt + timedelta(days=1), breite, laenge)
+    return auf, unter
+
+
 def startziel(achse):
     if not achse["calibrated"] or not achse["referenced"]:
         raise ValueError("Achse zuerst kalibrieren und referenzieren")

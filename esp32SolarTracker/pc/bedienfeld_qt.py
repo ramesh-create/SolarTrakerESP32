@@ -1,4 +1,4 @@
-"""SolarTracker 0.6.4: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
+"""SolarTracker 0.6.5: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
 
 Start: python bedienfeld_qt.py. Firmware 0.4.0 / Protokoll 3: Positionen und Tests bleiben gespeichert.
 """
@@ -15,10 +15,10 @@ from serial.tools import list_ports
 from design_basis import DesignFenster
 from steuerzentrale import Steuerzentrale, STANDARD, PHASEN, grenztest_fehler, status_text
 from sonne import sonnenstand
-from tageslauf import sonnenfenster, panelneigung
+from tageslauf import sonnenfenster, aktuelles_sonnenfenster, panelneigung
 from weltkarte import Weltkarte
 
-VERSION = "0.6.4"
+VERSION = "0.6.5"
 ORDNER = Path(__file__).resolve().parent
 
 
@@ -487,7 +487,7 @@ class Bedienpanel(DesignFenster):
             tempo=self.tempo.value()
             if duration is not None:
                 now=datetime.now().astimezone()
-                auf,unter=sonnenfenster(now,self.core.werte["breite"],self.core.werte["laenge"])
+                auf,unter=aktuelles_sonnenfenster(now,self.core.werte["breite"],self.core.werte["laenge"])
                 tempo=max(1,(unter-auf).total_seconds()/duration)
                 self.tempo.setValue(tempo)
             self.core.starten("Simulation",tempo,neu=neu)

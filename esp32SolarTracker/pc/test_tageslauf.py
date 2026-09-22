@@ -50,6 +50,16 @@ class TageslaufTests(unittest.TestCase):
             datum.now.return_value=TAG
             self.c.starten("Simulation",3600)
 
+    def test_simulation_nachts_folgetag(self):
+        from tageslauf import aktuelles_sonnenfenster
+        nacht=datetime(2026,9,16,23,0,tzinfo=timezone(timedelta(hours=2)))
+        auf,unter=aktuelles_sonnenfenster(nacht,50.187,8.739)
+        self.assertEqual(auf.date(),nacht.date()+timedelta(days=1))
+        with patch("steuerzentrale.datetime") as datum:
+            datum.now.return_value=nacht
+            self.c.starten("Simulation",3600)
+        self.assertEqual(self.c.simstart.date(),nacht.date()+timedelta(days=1))
+
     def test_sonnenstunden_und_horizont(self):
         auf,unter=sonnenfenster(TAG,50.187,8.739)
         self.assertTrue(6 <= auf.hour <= 8)

@@ -1,4 +1,4 @@
-// Version 0.6.0. Eingabe: zeilenweise PC-Befehle. Ausgabe: JSON-Zeilen.
+// Version 0.6.1. Eingabe: zeilenweise PC-Befehle. Ausgabe: JSON-Zeilen.
 // Beispiel: 1 HELLO 3\n, 2 PING\n, 3 STATUS\n. Protokoll siehe README.
 #include "Steuerung.h"
 #include <Arduino.h>
@@ -133,7 +133,7 @@ void status() {
     if (w.hoehe <= 0) { sunAz = ABSTAND; sunEl = ABSTAND; }
     else { sunAz = zielAzimut(w, confAzNull, achsen[0].spanne, ABSTAND); sunEl = zielElevation(w.hoehe, confElNeigung, achsen[1].spanne, ABSTAND); }
   }
-  Serial.printf("{\"type\":\"status\",\"protocol\":3,\"version\":\"0.6.0\",\"switch_test\":%d,\"switch_testing\":%s,\"rtc_present\":%s,\"rtc_valid\":%s,\"rtc_epoch\":%lu,\"axes\":[",
+  Serial.printf("{\"type\":\"status\",\"protocol\":3,\"version\":\"0.6.1\",\"switch_test\":%d,\"switch_testing\":%s,\"rtc_present\":%s,\"rtc_valid\":%s,\"rtc_epoch\":%lu,\"axes\":[",
     schalterTest.index, schalterTest.aktiv ? "true" : "false", rtcVorhanden ? "true" : "false", rtcGueltig ? "true" : "false", (unsigned long)(rtcGueltig ? rtcSekunden + (millis()-rtcZeit)/1000 : 0));
   for (int i = 0; i < 2; ++i) {
     auto& a = achsen[i];
@@ -162,22 +162,26 @@ const char* kurzStatus(const Achse& a) {
 }
 void lcdStatus() {
   if (autoPhase || millis() < lcdManuellBis) return;
-  const char* aktion = kurzStatus(achsen[0].zustand != RUHE ? achsen[0] : achsen[1]);
+  static uint8_t wechsel = 0;
+  ++wechsel;
   char oben[17], unten[17];
   if (rtcGueltig) {
-    uint32_t lokal = rtcSekunden + uint32_t(tagesversatz(rtcSekunden)) * 3600u;
-    snprintf(oben, sizeof(oben), "%02d:%02d:%02d %s", int(lokal / 3600 % 24), int(lokal / 60 % 60), int(lokal % 60), aktion);
+    Kalender k = kalenderZeit(rtcSekunden, tagesversatz(rtcSekunden));
+    snprintf(oben, sizeof(oben), "%02d.%02d.%02d %02d:%02d", k.tag, k.monat, k.jahr % 100, k.stunde, k.minute);
   } else {
-    snprintf(oben, sizeof(oben), "--:--:-- %s", aktion);
+    snprintf(oben, sizeof(oben), "--.--.-- --:--");
   }
-  if (achsen[0].referenz && achsen[1].referenz && confOK) {
+  bool faehrt = achsen[0].zustand != RUHE || achsen[1].zustand != RUHE;
+  if (faehrt) {
+    snprintf(unten, sizeof(unten), "%s", kurzStatus(achsen[0].zustand != RUHE ? achsen[0] : achsen[1]));
+  } else if (achsen[0].referenz && achsen[1].referenz && confOK && (wechsel / 3) % 2 == 0) {
     int az = lroundf(confAzNull + (achsen[0].position - ABSTAND) * 360.0f / 4096.0f);
     az = ((az % 360) + 360) % 360;
     int ng = lroundf(confElNeigung - (achsen[1].position - ABSTAND) * 360.0f / 4096.0f);
     ng = ng < 0 ? 0 : (ng > 90 ? 90 : ng);
     snprintf(unten, sizeof(unten), "Az%3d Ng%2d", az, ng);
   } else {
-    snprintf(unten, sizeof(unten), "Az --  Ng --");
+    snprintf(unten, sizeof(unten), "%s", autoModus ? "Autonom" : (verbunden ? "PC-Bereit" : "Bereit"));
   }
   char hex[2][33];
   const char* texte[] = {oben, unten};

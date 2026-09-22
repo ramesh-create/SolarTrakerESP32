@@ -1,4 +1,4 @@
-"""PC-Steuerung 0.6.4: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
+"""PC-Steuerung 0.6.5: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
 
 GUI-unabhaengig. Eingabe: Bedienbefehle und Protokoll 3; Ausgabe: Status/Ereignisse.
 Keine simulierten Endschalter oder Motor-Istwerte. Poll muss alle 50 ms laufen.
@@ -11,7 +11,7 @@ import math
 from verbindung import Verbindung
 from betriebsspeicher import BetriebsSpeicher
 from sonne import sonnenstand
-from tageslauf import sonnenfenster, startziel, tagesziel, elevationsziel
+from tageslauf import sonnenfenster, aktuelles_sonnenfenster, startziel, tagesziel, elevationsziel
 
 STANDARD = dict(breite=50.187, laenge=8.739, az_null=90.0, el_neigung=90.0)
 PHASEN = ("Bereit", "Fahrt", "Suche MIN", "Entlaste MIN", "Suche MAX",
@@ -383,7 +383,10 @@ class Steuerzentrale:
         self.fortsetzung=None
         self.betriebsdaten_sichern("simulation",None)
         jetzt = datetime.now().astimezone()
-        auf, unter = sonnenfenster(jetzt,self.werte["breite"],self.werte["laenge"])
+        if modus == "Simulation":
+            auf, unter = aktuelles_sonnenfenster(jetzt,self.werte["breite"],self.werte["laenge"])
+        else:
+            auf, unter = sonnenfenster(jetzt,self.werte["breite"],self.werte["laenge"])
         self.simstart, self.simende = auf, unter
         self.simzeit = auf if modus == "Simulation" else jetzt
         self.letzter_tick = self.uhr()

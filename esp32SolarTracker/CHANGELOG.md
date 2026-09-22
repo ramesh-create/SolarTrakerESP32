@@ -1,5 +1,16 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.6.5 / Firmware 0.6.1 / Dokumentation 0.34 - 22.09.2026
+
+- LCD zeigt jetzt **Datum und lokale Zeit**: Zeile 1 `TT.MM.JJ HH:MM`. Zeile 2
+  wechselt alle 3 s zwischen Winkeln (`Az### Ng##`) und Status (`Autonom`/`PC`/
+  `Bereit`); waehrend einer Fahrt wird die Aktion angezeigt. Neues Kalender-
+  Hilfsmodul in `Sonne` (`kalenderZeit`).
+- **Simulation laeuft immer**: Nach Sonnenuntergang verwendet sie automatisch
+  das Sonnenfenster des **Folgetags** (`aktuelles_sonnenfenster`), auch wenn es
+  nachts ist. Gilt fuer Simulation und die Tempo-Berechnung im PC.
+- 108 PC-Tests bestanden; Firmware kompiliert (341952 Byte).
+
 ## PC 0.6.4 / Dokumentation 0.33 - 21.09.2026
 
 - Weltkarte interaktiv (grosse Karte auf der Simulationsseite):

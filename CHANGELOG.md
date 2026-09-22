@@ -1,5 +1,12 @@
 # Changelog
 
+## PC 0.6.5 / Firmware 0.6.1 / Dokumentation 0.34 - 22.09.2026
+
+- LCD zeigt Datum und lokale Zeit (Zeile 1 `TT.MM.JJ HH:MM`); Zeile 2 wechselt
+  alle 3 s zwischen Winkeln und Status/Aktion.
+- Simulation laeuft immer: nach Sonnenuntergang automatisch mit dem
+  Sonnenfenster des Folgetags (`aktuelles_sonnenfenster`). 108 PC-Tests bestehen.
+
 ## PC 0.6.4 / Dokumentation 0.33 - 21.09.2026
 
 - Weltkarte interaktiv: Zoom per Mausrad (bis 16x, cursorzentriert), Karte

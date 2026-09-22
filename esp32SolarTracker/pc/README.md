@@ -1,6 +1,6 @@
-# SolarTracker PC-Bedienfeld 0.6.4 - Design 1
+# SolarTracker PC-Bedienfeld 0.6.5 - Design 1
 
-Dokumentation 0.33, 21.09.2026. Start: `Start.cmd` doppelt anklicken.
+Dokumentation 0.34, 22.09.2026. Start: `Start.cmd` doppelt anklicken.
 Das alte Bedienfenster zuvor schliessen. Fuer die echte LCD-Uebertragung ist Firmware 0.3.2 / Protokoll 3 erforderlich.
 Firmware 0.3.1 bleibt fuer Motoren und RTC kompatibel. Python, pyserial und PySide6 sind in `.venv` installiert.
 
@@ -110,6 +110,18 @@ Der Punkt wird aus Breite/Laenge berechnet (equirectangular:
 - Quelle: `pc/weltkarte.png` – vom Nutzer bereitgestellte **Plexus-Weltkarte**,
   2:1, dunkler Hintergrund, equirectangular. Offline, kein Netz.
 - Neues Modul `weltkarte.py` (Projektion, Zoom/Pan, Drag & Drop).
+
+## Simulation immer (PC 0.6.5)
+
+Die Simulation laeuft immer: Ist es nach Sonnenuntergang (Nacht), verwendet sie
+automatisch das Sonnenfenster des **Folgetags** (`aktuelles_sonnenfenster`).
+Auch die Tempo-Berechnung nutzt dasselbe Fenster.
+
+## LCD (Firmware 0.6.1)
+
+Das LCD zeigt **Datum und lokale Zeit** (`TT.MM.JJ HH:MM`). Zeile 2 wechselt
+alle 3 s zwischen Winkeln (`Az### Ng##`) und Status (`Autonom`/`PC-Bereit`/
+`Bereit`); waehrend einer Fahrt steht dort die Aktion.
 
 ## Alles steuern (PC 0.6.2)
 

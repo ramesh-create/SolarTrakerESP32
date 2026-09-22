@@ -57,6 +57,14 @@ float begrenze(float wert, float unten, float oben) {
 }
 }
 
+Kalender kalenderZeit(uint32_t utc, int versatz) {
+  Zeit z = zeitAusEpoch(utc + uint32_t(versatz) * 3600u);
+  Kalender k;
+  k.jahr = z.jahr; k.monat = z.monat; k.tag = z.tag;
+  k.stunde = z.stunde; k.minute = z.minute; k.sekunde = z.sekunde;
+  return k;
+}
+
 int tagesversatz(uint32_t utc) {
   Zeit z = zeitAusEpoch(utc);
   uint32_t start = tageAusDatum(z.jahr, 3, letzterSonntag(z.jahr, 3)) * 86400u + 3600u;
