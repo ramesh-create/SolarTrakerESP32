@@ -1,7 +1,14 @@
-# ESP32-PCSteuerung 0.6.1
+# ESP32-PCSteuerung 0.6.2
 
 Stand: 22.09.2026. Eigenstaendige Firmware fuer das [Python-Bedienfeld](../pc/README.md).
 Kein automatischer Motorstart; die Hauptsoftware bleibt separat erhalten.
+
+## Stand 0.6.2 (22.09.2026)
+
+Neuer Befehl `ORT <hex>` (16 ASCII-Zeichen): speichert den Ortsnamen (Stadt,
+Land) mit Pruefsumme-frei im NVS und zeigt ihn auf dem LCD als **dritte
+Wechselzeile** (Winkel / Status / Ort). Status ergaenzt `ort_supported`. Der PC
+sendet `ORT` zusammen mit `CONF`. Protokoll 3, margin=114, Fahrlogik unveraendert.
 
 ## Stand 0.6.1 (22.09.2026)
 

@@ -1,4 +1,4 @@
-"""SolarTracker 0.6.5: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
+"""SolarTracker 0.6.6: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
 
 Start: python bedienfeld_qt.py. Firmware 0.4.0 / Protokoll 3: Positionen und Tests bleiben gespeichert.
 """
@@ -18,7 +18,7 @@ from sonne import sonnenstand
 from tageslauf import sonnenfenster, aktuelles_sonnenfenster, panelneigung
 from weltkarte import Weltkarte
 
-VERSION = "0.6.5"
+VERSION = "0.6.6"
 ORDNER = Path(__file__).resolve().parent
 
 
@@ -101,6 +101,7 @@ class Bedienpanel(DesignFenster):
             self.protokoll(f"Einstellungen: {exc}")
         self.lat.setValue(self.core.werte["breite"]); self.lon.setValue(self.core.werte["laenge"])
         self.az_null.setValue(self.core.werte["az_null"]); self.el_null.setValue(self.core.werte["el_neigung"])
+        self.land.setText(self.core.werte.get("land","")); self.stadt.setText(self.core.werte.get("stadt",""))
         for widget in (self.lat,self.lon,self.az_null,self.el_null):
             widget.valueChanged.connect(self.einstellung_geaendert)
         self.ausrichtung.setChecked(self.core.ausrichtung_bestaetigt)
@@ -536,7 +537,7 @@ class Bedienpanel(DesignFenster):
             if self.core.modus!="Pause": self.stop_all()
 
     def settings_values(self):
-        return dict(breite=self.lat.value(),laenge=self.lon.value(),az_null=self.az_null.value(),el_neigung=self.el_null.value())
+        return dict(breite=self.lat.value(),laenge=self.lon.value(),az_null=self.az_null.value(),el_neigung=self.el_null.value(),land=self.land.text().strip(),stadt=self.stadt.text().strip())
 
     def save_settings(self):
         def action():
@@ -663,13 +664,14 @@ class Bedienpanel(DesignFenster):
             b.setEnabled(bool(c.bereit and not c.beschaeftigt and c.modus=="Pause" and n and n.get("switch_test")==4))
         if hasattr(self,"lat"):
             lat,lon=self.lat.value(),self.lon.value()
+            name=", ".join(t for t in (self.stadt.text().strip(),self.land.text().strip()) if t)
         elif n and n.get("conf_ok") and n.get("lat") is not None:
-            lat,lon=n.get("lat"),n.get("lon")
+            lat,lon=n.get("lat"),n.get("lon"); name=""
         else:
-            lat,lon=c.werte.get("breite"),c.werte.get("laenge")
+            lat,lon=c.werte.get("breite"),c.werte.get("laenge"); name=""
         for karte in (getattr(self,"weltkarte_klein",None),getattr(self,"weltkarte_gross",None)):
             if karte is not None:
-                karte.set_ort(lat,lon)
+                karte.set_ort(lat,lon,name)
         fehler=c.freigabe(); self.freigabe_label.setText("Start gesperrt:\n"+"\n".join(fehler[:4]) if fehler else "Alle Startprüfungen OK")
         farbe="#208447" if not fehler and n and n.get("auto_ok",False) else "#101010"
         for knopf in [self.btn_oper,self.btn_sim,self.operation_btn,self.sim_start,self.sim_neu,*self.sim_buttons]:

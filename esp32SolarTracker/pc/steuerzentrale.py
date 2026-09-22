@@ -1,4 +1,4 @@
-"""PC-Steuerung 0.6.5: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
+"""PC-Steuerung 0.6.6: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
 
 GUI-unabhaengig. Eingabe: Bedienbefehle und Protokoll 3; Ausgabe: Status/Ereignisse.
 Keine simulierten Endschalter oder Motor-Istwerte. Poll muss alle 50 ms laufen.
@@ -25,6 +25,11 @@ def pruefe_einstellungen(werte):
     for k, wert in daten.items():
         if not math.isfinite(wert) or not grenzen[k][0] <= wert <= grenzen[k][1]:
             raise ValueError(f"Ungueltiger Wert: {k}")
+    for k in ("land", "stadt"):
+        text = str(werte.get(k, "")).strip()
+        if any(ord(c) < 32 for c in text):
+            raise ValueError(f"Ungueltiger Text: {k}")
+        daten[k] = text[:40]
     return daten
 
 
@@ -239,7 +244,23 @@ class Steuerzentrale:
             raise ValueError("Konfiguration erst bei stillstehenden Achsen")
         w=self.werte
         self.senden("CONF",f"{w['breite']:.3f}",f"{w['laenge']:.3f}",f"{w['az_null']:.2f}",f"{w['el_neigung']:.2f}")
+        self.ort_senden()
         self.protokoll("Standort und Ausrichtung an den ESP32 uebertragen")
+
+    def ort_senden(self):
+        """Ortsname (Stadt, Land) fuer das LCD an den ESP32 senden."""
+        if not self.bereit or not self.status.get("ort_supported",False):
+            return
+        text = ", ".join(t for t in (self.werte.get("stadt",""), self.werte.get("land","")) if t)
+        if not text:
+            return
+        for alt,neu in (("\u00e4","ae"),("\u00f6","oe"),("\u00fc","ue"),("\u00c4","Ae"),("\u00d6","Oe"),("\u00dc","Ue"),("\u00df","ss")):
+            text = text.replace(alt,neu)
+        text = text[:16].ljust(16)
+        if any(ord(c) < 32 or ord(c) > 126 for c in text):
+            raise ValueError("Ort: nur druckbare Zeichen (Umlaute werden ae/oe/ue)")
+        self.senden("ORT", text.encode("ascii").hex())
+        self.protokoll("Ort an ESP32 uebertragen: " + text.strip())
 
     def autonom(self,ein):
         if not self.bereit:

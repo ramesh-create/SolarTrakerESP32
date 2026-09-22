@@ -36,6 +36,7 @@ class Weltkarte(QWidget):
         super().__init__()
         self.breite = None
         self.laenge = None
+        self.name = ""
         self.kompakt = kompakt
         self.bearbeitbar = False
         self.bild = QPixmap(str(BILD)) if BILD.exists() else QPixmap()
@@ -53,9 +54,10 @@ class Weltkarte(QWidget):
         self.setMouseTracking(self.bearbeitbar)
         self.setCursor(QCursor(Qt.CrossCursor if self.bearbeitbar else Qt.ArrowCursor))
 
-    def set_ort(self, breite, laenge):
+    def set_ort(self, breite, laenge, name=""):
         if getattr(self, "_modus", None) == "marker":
             return  # waehrend des Ziehens keine externen Updates
+        self.name = str(name or "")
         try:
             self.breite = float(breite)
             self.laenge = float(laenge)
@@ -193,4 +195,5 @@ class Weltkarte(QWidget):
         p.drawLine(int(mx), int(my - 2 * r), int(mx), int(my + 2 * r))
         if not self.kompakt:
             p.setFont(QFont("Segoe UI", 9, QFont.Bold)); p.setPen(QColor("#ffffff"))
-            p.drawText(int(mx) + 10, int(my) - 8, f"{self.breite:.3f}, {self.laenge:.3f}")
+            text = self.name if self.name else f"{self.breite:.3f}, {self.laenge:.3f}"
+            p.drawText(int(mx) + 10, int(my) - 8, text)

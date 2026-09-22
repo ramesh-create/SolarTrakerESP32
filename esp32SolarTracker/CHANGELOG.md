@@ -1,5 +1,16 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.6.6 / Firmware 0.6.2 / Dokumentation 0.35 - 22.09.2026
+
+- Ortsangabe: In den Einstellungen unter den Koordinaten neue Felder **Land**
+  und **Stadt**. Sie werden in `einstellungen.json` gespeichert und im
+  PC-Bedienfeld angezeigt (u. a. als Label am Karten-Punkt statt der Koordinaten).
+- Firmware 0.6.2: neuer Befehl `ORT <hex>` (16 ASCII-Zeichen) speichert den
+  Ortsnamen im NVS. Das LCD zeigt ihn als dritte Wechselzeile (Winkel / Status /
+  Ort). Status ergaenzt `ort_supported`.
+- `konfiguration_senden` sendet zusaetzlich `ORT`. 111 PC-Tests bestanden;
+  Firmware kompiliert (342948 Byte).
+
 ## PC 0.6.5 / Firmware 0.6.1 / Dokumentation 0.34 - 22.09.2026
 
 - LCD zeigt jetzt **Datum und lokale Zeit**: Zeile 1 `TT.MM.JJ HH:MM`. Zeile 2

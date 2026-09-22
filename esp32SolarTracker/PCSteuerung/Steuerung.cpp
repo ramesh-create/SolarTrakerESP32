@@ -1,4 +1,4 @@
-// Version 0.6.1. Eingabe: zeilenweise PC-Befehle. Ausgabe: JSON-Zeilen.
+// Version 0.6.2. Eingabe: zeilenweise PC-Befehle. Ausgabe: JSON-Zeilen.
 // Beispiel: 1 HELLO 3\n, 2 PING\n, 3 STATUS\n. Protokoll siehe README.
 #include "Steuerung.h"
 #include <Arduino.h>
@@ -11,6 +11,7 @@
 #include "Entprellung.h"
 #include "Sonne.h"
 #include "LcdSteuerung.h"
+#include "LcdText.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +55,7 @@ bool autoModus=false, confOK=false;
 float confBreite=0, confLaenge=0, confAzNull=90, confElNeigung=90;
 unsigned long zielZeit=0;
 int zielAz=-1, zielEl=-1;
+char ortText[17]="";
 void autonomAktualisieren();
 RTC_DS3231 rtc;
 bool rtcVorhanden = false, rtcGueltig = false;
@@ -133,7 +135,7 @@ void status() {
     if (w.hoehe <= 0) { sunAz = ABSTAND; sunEl = ABSTAND; }
     else { sunAz = zielAzimut(w, confAzNull, achsen[0].spanne, ABSTAND); sunEl = zielElevation(w.hoehe, confElNeigung, achsen[1].spanne, ABSTAND); }
   }
-  Serial.printf("{\"type\":\"status\",\"protocol\":3,\"version\":\"0.6.1\",\"switch_test\":%d,\"switch_testing\":%s,\"rtc_present\":%s,\"rtc_valid\":%s,\"rtc_epoch\":%lu,\"axes\":[",
+  Serial.printf("{\"type\":\"status\",\"protocol\":3,\"version\":\"0.6.2\",\"switch_test\":%d,\"switch_testing\":%s,\"rtc_present\":%s,\"rtc_valid\":%s,\"rtc_epoch\":%lu,\"axes\":[",
     schalterTest.index, schalterTest.aktiv ? "true" : "false", rtcVorhanden ? "true" : "false", rtcGueltig ? "true" : "false", (unsigned long)(rtcGueltig ? rtcSekunden + (millis()-rtcZeit)/1000 : 0));
   for (int i = 0; i < 2; ++i) {
     auto& a = achsen[i];
@@ -141,7 +143,7 @@ void status() {
       i ? "," : "", a.position, a.spanne, a.spanne > 0 ? "true" : "false",
       a.referenz ? "true" : "false", int(a.zustand), minAktiv(a) ? "true" : "false", maxAktiv(a) ? "true" : "false", a.grenzenOK ? "true" : "false", (unsigned long)a.generation);
   }
-  Serial.printf("],\"auto_supported\":true,\"auto_testing\":%s,\"auto_ok\":%s,\"auto_message\":\"%s\",\"auto_mode\":%s,\"conf_ok\":%s%s,\"sun_az\":%d,\"sun_el\":%d,\"device_id\":\"%012llx\",\"position_storage\":true,\"storage_ok\":%s,\"lcd_supported\":true,\"lcd_present\":%s}\n", autoPhase ? "true" : "false", autoOK && freigegeben() ? "true" : "false", autoMeldung, autoModus ? "true" : "false", confOK ? "true" : "false", conf, sunAz, sunEl, (unsigned long long)ESP.getEfuseMac(), speicherOK ? "true" : "false", lcdErreichbar() ? "true" : "false");
+  Serial.printf("],\"auto_supported\":true,\"auto_testing\":%s,\"auto_ok\":%s,\"auto_message\":\"%s\",\"auto_mode\":%s,\"conf_ok\":%s%s,\"sun_az\":%d,\"sun_el\":%d,\"device_id\":\"%012llx\",\"position_storage\":true,\"storage_ok\":%s,\"lcd_supported\":true,\"lcd_present\":%s,\"ort_supported\":true}\n", autoPhase ? "true" : "false", autoOK && freigegeben() ? "true" : "false", autoMeldung, autoModus ? "true" : "false", confOK ? "true" : "false", conf, sunAz, sunEl, (unsigned long long)ESP.getEfuseMac(), speicherOK ? "true" : "false", lcdErreichbar() ? "true" : "false");
 }
 // Live-Anzeige: Zeit + Status/Aktion (Zeile 1), Azimut + Panelneigung (Zeile 2).
 const char* kurzStatus(const Achse& a) {
@@ -174,14 +176,19 @@ void lcdStatus() {
   bool faehrt = achsen[0].zustand != RUHE || achsen[1].zustand != RUHE;
   if (faehrt) {
     snprintf(unten, sizeof(unten), "%s", kurzStatus(achsen[0].zustand != RUHE ? achsen[0] : achsen[1]));
-  } else if (achsen[0].referenz && achsen[1].referenz && confOK && (wechsel / 3) % 2 == 0) {
-    int az = lroundf(confAzNull + (achsen[0].position - ABSTAND) * 360.0f / 4096.0f);
-    az = ((az % 360) + 360) % 360;
-    int ng = lroundf(confElNeigung - (achsen[1].position - ABSTAND) * 360.0f / 4096.0f);
-    ng = ng < 0 ? 0 : (ng > 90 ? 90 : ng);
-    snprintf(unten, sizeof(unten), "Az%3d Ng%2d", az, ng);
   } else {
-    snprintf(unten, sizeof(unten), "%s", autoModus ? "Autonom" : (verbunden ? "PC-Bereit" : "Bereit"));
+    uint8_t schirm = (wechsel / 3) % 3;
+    if (schirm == 0 && achsen[0].referenz && achsen[1].referenz && confOK) {
+      int az = lroundf(confAzNull + (achsen[0].position - ABSTAND) * 360.0f / 4096.0f);
+      az = ((az % 360) + 360) % 360;
+      int ng = lroundf(confElNeigung - (achsen[1].position - ABSTAND) * 360.0f / 4096.0f);
+      ng = ng < 0 ? 0 : (ng > 90 ? 90 : ng);
+      snprintf(unten, sizeof(unten), "Az%3d Ng%2d", az, ng);
+    } else if (schirm == 2 && ortText[0]) {
+      snprintf(unten, sizeof(unten), "%s", ortText);
+    } else {
+      snprintf(unten, sizeof(unten), "%s", autoModus ? "Autonom" : (verbunden ? "PC-Bereit" : "Bereit"));
+    }
   }
   char hex[2][33];
   const char* texte[] = {oben, unten};
@@ -469,6 +476,13 @@ void befehl() {
     if (!fehlertext) lcdManuellBis = millis() + 30000;  // 30 s eigene Anzeige vor Live-Status
     antwort(id,fehlertext); status(); return;
   }
+  if (!strcmp(cmd, "ORT") && arg1 && !arg2) {
+    if (!lcdZeileGueltig(arg1)) { antwort(id, "ORT: 16 Hex-Zeichen erwartet"); return; }
+    for (int i = 0; i < 16; ++i) ortText[i] = char(hexZiffer(arg1[2*i]) * 16 + hexZiffer(arg1[2*i+1]));
+    ortText[16] = 0;
+    if (speicherOK) speicher.putString("ort", ortText);
+    antwort(id); status(); return;
+  }
   if (!strcmp(cmd, "TIME") && arg1 && !arg2) {
     double epoch;
     if (!zahl(arg1, epoch) || floor(epoch) != epoch || epoch < 946684800 || epoch > 4102444799.0) { antwort(id, "UTC-Zeit ausserhalb 2000 bis 2099"); return; }
@@ -573,6 +587,10 @@ void steuerungStarten() {
     confElNeigung = speicher.getInt("elneig",9000)/100.0f;
   }
   autoModus = speicherOK && speicher.getBool("auto_mode",false);
+  if (speicherOK) {
+    String o = speicher.getString("ort", "");
+    snprintf(ortText, sizeof(ortText), "%s", o.c_str());
+  }
   if (autoOK) autoAnzeige("Tests gespeichert",freigegeben() && rtcGueltig?"Normalbetr.bereit":"Freigabe fehlt");
   status();
 }

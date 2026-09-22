@@ -353,6 +353,36 @@ class DesignTests(unittest.TestCase):
         self.assertIn(b" STOP",self.win.core.link.port.gesendet[-1])
 
 
+    def test_ort_wird_gesendet(self):
+        vorbereiten(self.win.core)
+        c=self.win.core
+        c.werte["land"]="Deutschland"; c.werte["stadt"]="Bad Vilbel"
+        c.status["ort_supported"]=True
+        c.konfiguration_senden()
+        befehle=[b.decode() for b in c.link.port.gesendet]
+        self.assertTrue(any(" ORT " in b for b in befehle))
+        self.assertTrue(any("CONF 50.187 8.739" in b for b in befehle))
+
+    def test_ort_ohne_firmware_kein_befehl(self):
+        vorbereiten(self.win.core)
+        c=self.win.core
+        c.werte["stadt"]="Bad Vilbel"
+        c.status.pop("ort_supported",None)
+        anfang=len(c.link.port.gesendet)
+        c.konfiguration_senden()
+        self.assertFalse(any(b" ORT " in b for b in c.link.port.gesendet[anfang:]))
+
+    def test_ort_gespeichert_und_geladen(self):
+        c=self.win.core
+        import tempfile
+        from pathlib import Path
+        p=Path(tempfile.mkdtemp())/"e.json"
+        c.speichern(p,{**c.werte,"land":"Deutschland","stadt":"Bad Vilbel"})
+        c2=Steuerzentrale(); c2.laden(p)
+        self.assertEqual(c2.werte["land"],"Deutschland")
+        self.assertEqual(c2.werte["stadt"],"Bad Vilbel")
+
+
 class WeltkartenTests(unittest.TestCase):
     def test_equator_nullpunkt(self):
         from weltkarte import kartenpunkt

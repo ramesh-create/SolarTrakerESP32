@@ -1,4 +1,4 @@
-"""Ansicht 0.6.5, aus solartracker_ui_design1.py des Benutzers abgeleitet.
+"""Ansicht 0.6.6, aus solartracker_ui_design1.py des Benutzers abgeleitet.
 Demo-Logik entfernt; reale Aktionen implementiert bedienfeld_qt.py.
 """
 import sys
@@ -101,7 +101,7 @@ class DesignFenster(QMainWindow):
             nav_layout.addWidget(btn)
             btn.clicked.connect(lambda checked=False, index=i: self.pages.setCurrentIndex(index))
         nav_layout.addStretch()
-        hint = QLabel('Design 1\nPC-Steuerung 0.6.5')
+        hint = QLabel('Design 1\nPC-Steuerung 0.6.6')
         hint.setObjectName('muted')
         nav_layout.addWidget(hint)
         main.addWidget(nav)
@@ -303,8 +303,16 @@ class DesignFenster(QMainWindow):
         form.addWidget(self.lat, 2, 1)
         form.addWidget(QLabel('Längengrad'), 3, 0)
         form.addWidget(self.lon, 3, 1)
-        form.addWidget(QLabel('Sprache'), 4, 0)
-        form.addWidget(self.lang, 4, 1)
+        self.land = QLineEdit()
+        self.land.setPlaceholderText('z. B. Deutschland')
+        self.stadt = QLineEdit()
+        self.stadt.setPlaceholderText('z. B. Bad Vilbel')
+        form.addWidget(QLabel('Land'), 4, 0)
+        form.addWidget(self.land, 4, 1)
+        form.addWidget(QLabel('Stadt'), 5, 0)
+        form.addWidget(self.stadt, 5, 1)
+        form.addWidget(QLabel('Sprache'), 6, 0)
+        form.addWidget(self.lang, 6, 1)
         st.addLayout(form)
         save = QPushButton('Einstellungen übernehmen')
         save.setObjectName('primary')
