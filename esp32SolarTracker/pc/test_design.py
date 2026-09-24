@@ -417,4 +417,21 @@ class WeltkartenTests(unittest.TestCase):
             self.assertAlmostEqual(l,laenge,places=6)
 
 
+class OrtsTests(unittest.TestCase):
+    def test_vorschlag_paris(self):
+        from orte import vorschlag
+        stadt,land=vorschlag(48.86,2.35)
+        self.assertEqual(stadt,"Paris")
+        self.assertTrue(land)
+
+    def test_vorschlag_bad_vilbel_liefert_text(self):
+        from orte import vorschlag
+        stadt,land=vorschlag(50.187,8.739)
+        self.assertTrue(stadt and land)
+
+    def test_vorschlag_ohne_daten(self):
+        from orte import vorschlag
+        self.assertIsNone(vorschlag(float("nan"),8.0))
+
+
 if __name__=="__main__": unittest.main()

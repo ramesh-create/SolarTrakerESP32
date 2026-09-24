@@ -1,7 +1,7 @@
 # SolarTracker
 
 Zweiachsiger Solartracker auf Basis eines **ESP32-WROOM-32**. Dokumentationsstand
-**0.35 vom 22.09.2026**. PC-Bedienfeld **0.6.6**, Firmware **0.6.2**, Standalone **0.8**.
+**0.36 vom 22.09.2026**. PC-Bedienfeld **0.6.7**, Firmware **0.6.2**, Standalone **0.8**.
 
 > Der alte **Arduino-Uno-Stand** unter `software/` ist archiviert und wird nicht
 > mehr gepflegt. Aktive Entwicklung liegt ausschliesslich unter

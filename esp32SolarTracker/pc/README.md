@@ -1,6 +1,6 @@
-# SolarTracker PC-Bedienfeld 0.6.6 - Design 1
+# SolarTracker PC-Bedienfeld 0.6.7 - Design 1
 
-Dokumentation 0.35, 22.09.2026. Start: `Start.cmd` doppelt anklicken.
+Dokumentation 0.36, 22.09.2026. Start: `Start.cmd` doppelt anklicken.
 Das alte Bedienfenster zuvor schliessen. Fuer die echte LCD-Uebertragung ist Firmware 0.3.2 / Protokoll 3 erforderlich.
 Firmware 0.3.1 bleibt fuer Motoren und RTC kompatibel. Python, pyserial und PySide6 sind in `.venv` installiert.
 
@@ -111,13 +111,17 @@ Der Punkt wird aus Breite/Laenge berechnet (equirectangular:
   2:1, dunkler Hintergrund, equirectangular. Offline, kein Netz.
 - Neues Modul `weltkarte.py` (Projektion, Zoom/Pan, Drag & Drop).
 
-## Ortsangabe (PC 0.6.6 / Firmware 0.6.2)
+## Ortsangabe (PC 0.6.7 / Firmware 0.6.2)
 
 In den Einstellungen unter den Koordinaten gibt es Felder **Land** und **Stadt**.
 Sie werden in `einstellungen.json` gespeichert und im Panel angezeigt – u. a. als
 Label am Karten-Punkt (statt der Koordinaten). `konfiguration_senden` schickt
 zusaetzlich `ORT <hex>` an den ESP32; das LCD zeigt den Ort als dritte
 Wechselzeile (Winkel / Status / Ort). Umlaute werden als ae/oe/ue gesendet.
+
+- **Ort vorschlagen (offline):** Button setzt leere Felder Land/Stadt auf den
+  naechstgelegenen Ort aus `pc/orte.json` (Natural Earth, public domain, 1251
+  Orte; Modul `orte.py`). Nur ein Vorschlag, kein Netz noetig.
 
 ## Simulation immer (PC 0.6.5)
 

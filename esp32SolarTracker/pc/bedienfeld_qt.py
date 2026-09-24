@@ -1,4 +1,4 @@
-"""SolarTracker 0.6.6: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
+"""SolarTracker 0.6.7: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
 
 Start: python bedienfeld_qt.py. Firmware 0.4.0 / Protokoll 3: Positionen und Tests bleiben gespeichert.
 """
@@ -17,8 +17,9 @@ from steuerzentrale import Steuerzentrale, STANDARD, PHASEN, grenztest_fehler, s
 from sonne import sonnenstand
 from tageslauf import sonnenfenster, aktuelles_sonnenfenster, panelneigung
 from weltkarte import Weltkarte
+from orte import vorschlag
 
-VERSION = "0.6.6"
+VERSION = "0.6.7"
 ORDNER = Path(__file__).resolve().parent
 
 
@@ -240,6 +241,10 @@ class Bedienpanel(DesignFenster):
         lay.addWidget(QLabel("Panelneigung an sicherer EL-MIN (senkrecht = 90 Grad)"),1,0); lay.addWidget(self.el_null,1,1)
         self.ausrichtung=QCheckBox("Ausrichtung geprueft: AZ+ nach Westen, EL+ kippt Richtung waagerecht")
         lay.addWidget(self.ausrichtung,2,0,1,2)
+        self.ort_btn=QPushButton("Ort vorschlagen (aus Koordinaten)")
+        self.ort_btn.setToolTip("Setzt leere Felder Land/Stadt auf den naechstgelegenen Ort (offline, Natural Earth)")
+        self.ort_btn.clicked.connect(self.ort_vorschlagen)
+        lay.addWidget(self.ort_btn,3,0,1,2)
         self.auto_cal_btn=QPushButton("Auto Kalibrierung")
         self.auto_cal_btn.clicked.connect(lambda:self.aktion(self.core.auto_kalibrierung))
         auto_card=self.card(); auto_lay=QVBoxLayout(auto_card)
@@ -558,6 +563,16 @@ class Bedienpanel(DesignFenster):
                 self.core.konfiguration_senden()
             self.protokoll("Standort per Karte gesetzt: %.6f, %.6f" % (breite,laenge))
         self.aktion(action)
+
+    def ort_vorschlagen(self):
+        v=vorschlag(self.lat.value(),self.lon.value())
+        if not v:
+            self.protokoll("Ortsvorschlag: keine Daten")
+            return
+        stadt,land=v
+        if not self.stadt.text().strip(): self.stadt.setText(stadt)
+        if not self.land.text().strip(): self.land.setText(land)
+        self.protokoll(f"Ortsvorschlag: {stadt}, {land}")
 
     def grenzen_geaendert(self,*_):
         okay=bool(self.core.status and all(a["limits_ok"] for a in self.core.status["axes"]))
