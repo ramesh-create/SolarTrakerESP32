@@ -105,9 +105,11 @@ class Bedienpanel(DesignFenster):
         self.land.setText(self.core.werte.get("land","")); self.stadt.setText(self.core.werte.get("stadt",""))
         for widget in (self.lat,self.lon,self.az_null,self.el_null):
             widget.valueChanged.connect(self.einstellung_geaendert)
-        self.ausrichtung.setChecked(self.core.ausrichtung_bestaetigt)
+        self.lat.valueChanged.connect(self.ortspruefung)
+        self.lon.valueChanged.connect(self.ortspruefung)
         self.ausrichtung.stateChanged.connect(self.ausrichtung_geaendert)
         self.anzeige_bereit = True
+        self.ortspruefung()
         self.scan_ports()
         self.chart.berechnen(self.core.simzeit,self.core.werte)
         self.timer = QTimer(self); self.timer.timeout.connect(self.tick); self.timer.start(50)
@@ -570,9 +572,13 @@ class Bedienpanel(DesignFenster):
             self.protokoll("Ortsvorschlag: keine Daten")
             return
         stadt,land=v
-        if not self.stadt.text().strip(): self.stadt.setText(stadt)
-        if not self.land.text().strip(): self.land.setText(land)
-        self.protokoll(f"Ortsvorschlag: {stadt}, {land}")
+        self.stadt.setText(stadt)
+        self.land.setText(land)
+        self.protokoll(f"Ortsvorschlag gesetzt: {stadt}, {land}")
+
+    def ortspruefung(self,*_):
+        if not self.land.text().strip() and not self.stadt.text().strip():
+            self.ort_vorschlagen()
 
     def grenzen_geaendert(self,*_):
         okay=bool(self.core.status and all(a["limits_ok"] for a in self.core.status["axes"]))

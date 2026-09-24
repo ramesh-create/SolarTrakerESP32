@@ -3,9 +3,10 @@
 ## PC 0.6.7 / Dokumentation 0.36 - 22.09.2026
 
 - Offline-Ortsvorschlag: Button **„Ort vorschlagen (aus Koordinaten)"** unter den
-  Koordinaten setzt leere Felder Land/Stadt auf den naechstgelegenen Ort.
-  Daten: Natural Earth `ne_50m_populated_places` (public domain, 1251 Orte) in
-  `pc/orte.json`, Modul `orte.py`. Rein offline, kein Netz.
+  Koordinaten setzt **Land/Stadt** auf den naechstgelegenen Ort (ueberschreibt sie).
+  Zusaetzlich **automatisch**: beim Start und bei Koordinatenaenderung werden
+  leere Felder gefuellt. Daten: Natural Earth `ne_50m_populated_places`
+  (public domain, 1251 Orte) in `pc/orte.json`, Modul `orte.py`. Rein offline.
 - 114 PC-Tests bestanden.
 
 ## PC 0.6.6 / Firmware 0.6.2 / Dokumentation 0.35 - 22.09.2026

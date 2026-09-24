@@ -119,9 +119,10 @@ Label am Karten-Punkt (statt der Koordinaten). `konfiguration_senden` schickt
 zusaetzlich `ORT <hex>` an den ESP32; das LCD zeigt den Ort als dritte
 Wechselzeile (Winkel / Status / Ort). Umlaute werden als ae/oe/ue gesendet.
 
-- **Ort vorschlagen (offline):** Button setzt leere Felder Land/Stadt auf den
-  naechstgelegenen Ort aus `pc/orte.json` (Natural Earth, public domain, 1251
-  Orte; Modul `orte.py`). Nur ein Vorschlag, kein Netz noetig.
+- **Ort vorschlagen (offline):** Button setzt Land/Stadt auf den naechstgelegenen
+  Ort (ueberschreibt sie); zusaetzlich **automatisch** beim Start und bei
+  Koordinatenaenderung, wenn beide Felder leer sind. Daten: `pc/orte.json`
+  (Natural Earth, public domain, 1251 Orte; Modul `orte.py`). Kein Netz noetig.
 
 ## Simulation immer (PC 0.6.5)
 
