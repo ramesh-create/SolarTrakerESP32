@@ -1,5 +1,11 @@
 # Changelog
 
+## PC 0.7.1 / Dokumentation 0.38 - 24.09.2026
+
+- Globus verbessert: Drehen korrigiert (ruhig), groessere Kugel, geschmeidiger
+  Mausrad-Zoom, Doppelklick auf einen Ort setzt die Panel-Position.
+- 116 PC-Tests bestanden.
+
 ## PC 0.7.0 / Firmware 0.7.0 / Dokumentation 0.37 - 24.09.2026
 
 - Interaktiver 3D-Globus (QtQuick3D/QML): Plexus-Textur, Gitter, Marker mit

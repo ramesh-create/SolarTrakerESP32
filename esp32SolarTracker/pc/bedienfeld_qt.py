@@ -1,4 +1,4 @@
-"""SolarTracker 0.7.0: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
+"""SolarTracker 0.7.1: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
 
 Start: python bedienfeld_qt.py. Firmware 0.4.0 / Protokoll 3: Positionen und Tests bleiben gespeichert.
 """
@@ -20,7 +20,7 @@ from weltkarte import Weltkarte
 from globus import Globus
 from orte import vorschlag, zonenversatz
 
-VERSION = "0.7.0"
+VERSION = "0.7.1"
 ORDNER = Path(__file__).resolve().parent
 
 

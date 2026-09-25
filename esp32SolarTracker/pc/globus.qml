@@ -45,7 +45,7 @@ Item {
             eulerRotation.x: -50.187
             PerspectiveCamera {
                 id: kamera
-                position: Qt.vector3d(0, 0, 360 / root.zoomFaktor)
+                position: Qt.vector3d(0, 0, 320 / root.zoomFaktor)
                 fieldOfView: 40
             }
         }
@@ -86,23 +86,24 @@ Item {
 
     DragHandler {
         target: null
-        onActiveChanged: if (!active) return
+        property real startY: 0
+        property real startX: 0
+        onActiveChanged: if (active) { startY = gestell.eulerRotation.y; startX = gestell.eulerRotation.x }
         onTranslationChanged: {
-            gestell.eulerRotation.y += translation.x * 0.3
-            var neu = gestell.eulerRotation.x + translation.y * 0.3
-            gestell.eulerRotation.x = Math.max(-89, Math.min(89, neu))
+            gestell.eulerRotation.y = startY + translation.x * 0.35
+            gestell.eulerRotation.x = Math.max(-89, Math.min(89, startX + translation.y * 0.35))
         }
     }
 
     WheelHandler {
         onWheel: function (event) {
-            var f = 1.0 + event.angleDelta.y / 1200.0
-            root.zoomFaktor = Math.max(0.5, Math.min(5.0, root.zoomFaktor * f))
+            var f = Math.pow(1.0016, event.angleDelta.y)
+            root.zoomFaktor = Math.max(0.5, Math.min(3.2, root.zoomFaktor * f))
         }
     }
 
     TapHandler {
-        onTapped: function (eventPoint) {
+        onDoubleTapped: function (eventPoint) {
             var r = view.pick(eventPoint.position.x, eventPoint.position.y)
             if (r.objectHit) {
                 var p = r.position
@@ -127,6 +128,6 @@ Item {
         Text { text: "Breite: " + root.markerLat.toFixed(3) + "\u00B0"; color: "#3aa6ff"; font.pixelSize: 13 }
         Text { text: "Laenge: " + root.markerLon.toFixed(3) + "\u00B0"; color: "#3aa6ff"; font.pixelSize: 13 }
         Text { text: "Ortszeit: " + root.ortZeit; color: "#97a8bb"; font.pixelSize: 12 }
-        Text { text: "Ziehen = drehen, Rad = Zoom, Klick = Standort"; color: "#697b8e"; font.pixelSize: 11 }
+        Text { text: "Ziehen = drehen, Rad = Zoom, Doppelklick = Standort"; color: "#697b8e"; font.pixelSize: 11 }
     }
 }

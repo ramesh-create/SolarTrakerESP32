@@ -1,5 +1,13 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.7.1 / Dokumentation 0.38 - 24.09.2026
+
+- Globus verbessert: **Drehen korrigiert** (absolute Drehung ab Drag-Start statt
+  aufsummierender Translation -> ruhig und kontrolliert), **groessere Kugel**
+  (Kamera naeher), **geschmeidiger Mausrad-Zoom** (exponentiell, Bereich 0.5-3.2),
+  **Doppelklick** auf einen Ort setzt die Panel-Position (statt einfachem Klick).
+- 116 PC-Tests bestanden.
+
 ## PC 0.7.0 / Firmware 0.7.0 / Dokumentation 0.37 - 24.09.2026
 
 - **Interaktiver 3D-Globus** (QtQuick3D/QML) auf der Simulationsseite:

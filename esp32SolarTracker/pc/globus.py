@@ -16,7 +16,7 @@ class Globus(QQuickWidget):
     def __init__(self):
         super().__init__()
         self.setResizeMode(QQuickWidget.SizeRootObjectToView)
-        self.setMinimumHeight(260)
+        self.setMinimumHeight(360)
         self.setSource(QUrl.fromLocalFile(str(QML)))
         root = self.rootObject()
         if root is not None:
