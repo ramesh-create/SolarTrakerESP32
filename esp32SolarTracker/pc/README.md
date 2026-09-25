@@ -1,6 +1,6 @@
-# SolarTracker PC-Bedienfeld 0.6.7 - Design 1
+# SolarTracker PC-Bedienfeld 0.7.0 - Design 1
 
-Dokumentation 0.36, 22.09.2026. Start: `Start.cmd` doppelt anklicken.
+Dokumentation 0.37, 24.09.2026. Start: `Start.cmd` doppelt anklicken.
 Das alte Bedienfenster zuvor schliessen. Fuer die echte LCD-Uebertragung ist Firmware 0.3.2 / Protokoll 3 erforderlich.
 Firmware 0.3.1 bleibt fuer Motoren und RTC kompatibel. Python, pyserial und PySide6 sind in `.venv` installiert.
 
@@ -135,6 +135,23 @@ Auch die Tempo-Berechnung nutzt dasselbe Fenster.
 Das LCD zeigt **Datum und lokale Zeit** (`TT.MM.JJ HH:MM`). Zeile 2 wechselt
 alle 3 s zwischen Winkeln (`Az### Ng##`) und Status (`Autonom`/`PC-Bereit`/
 `Bereit`); waehrend einer Fahrt steht dort die Aktion.
+
+## Globus (PC 0.7.0)
+
+Auf der Simulationsseite gibt es einen Umschalter **Karte <-> Globus**. Der
+**Globus** (QtQuick3D) zeigt die Plexus-Weltkarte als Kugel mit Gitter
+(Breiten-/Laengengrade alle 15 Grad) und rotem Standort-Marker; Beschriftung:
+Name, Breite, Laenge, Ortszeit. **Ziehen** dreht, **Mausrad** zoomt (scharf),
+**Klick auf die Kugel** setzt den Standort. Die kleine Karte rechts unten bleibt
+flach.
+
+## Zeitzone (PC 0.7.0 / Firmware 0.7.0)
+
+Feld **Zeitzone (UTC-Versatz)** in den Einstellungen (Vorschlag aus der Laenge,
+z. B. 5.75 = Nepal; 2 = Deutschland Sommer). Diagramm und Simulation rechnen in
+**Ortszeit** des Panels, nicht in PC-Zeit. "Konfiguration an ESP32 senden"
+uebertraegt `TZ` (Minuten) fuer die autonome Nachfuehrung; ohne Wert gilt im
+ESP32 die EU-Regel (MEZ/MESZ).
 
 ## Alles steuern (PC 0.6.2)
 

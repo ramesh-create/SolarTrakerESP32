@@ -1,9 +1,9 @@
-"""PC-Steuerung 0.6.7: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
+"""PC-Steuerung 0.7.0: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
 
 GUI-unabhaengig. Eingabe: Bedienbefehle und Protokoll 3; Ausgabe: Status/Ereignisse.
 Keine simulierten Endschalter oder Motor-Istwerte. Poll muss alle 50 ms laufen.
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import time
@@ -30,6 +30,13 @@ def pruefe_einstellungen(werte):
         if any(ord(c) < 32 for c in text):
             raise ValueError(f"Ungueltiger Text: {k}")
         daten[k] = text[:40]
+    if werte.get("zeitzone") is not None:
+        wert = float(werte["zeitzone"])
+        if not math.isfinite(wert) or not -12 <= wert <= 14:
+            raise ValueError("Ungueltige Zeitzone")
+        daten["zeitzone"] = wert
+    else:
+        daten["zeitzone"] = round(datetime.now().astimezone().utcoffset().total_seconds() / 3600.0, 2)
     return daten
 
 
@@ -152,6 +159,13 @@ class Steuerzentrale:
         return bool(self.pending or (self.status and (self.status.get("auto_testing",False) or self.status["switch_testing"] or
                     any(a["state"] for a in self.status["axes"]))))
 
+    def standort_zeit(self):
+        """Aktuelle Zeit in der Zeitzone des Panel-Standorts."""
+        wert = self.werte.get("zeitzone")
+        if wert is None:
+            return datetime.now().astimezone()
+        return datetime.now(timezone.utc).astimezone(timezone(timedelta(hours=float(wert))))
+
     def verbinden(self, port):
         if self.link:
             self.trennen()
@@ -245,7 +259,17 @@ class Steuerzentrale:
         w=self.werte
         self.senden("CONF",f"{w['breite']:.3f}",f"{w['laenge']:.3f}",f"{w['az_null']:.2f}",f"{w['el_neigung']:.2f}")
         self.ort_senden()
+        self.tz_senden()
         self.protokoll("Standort und Ausrichtung an den ESP32 uebertragen")
+
+    def tz_senden(self):
+        """Zeitzonen-Versatz (in Minuten) fuer die autonome Nachfuehrung senden."""
+        if not self.bereit or not self.status.get("tz_supported",False):
+            return
+        wert = self.werte.get("zeitzone")
+        if wert is None:
+            return
+        self.senden("TZ", int(round(float(wert)*60)))
 
     def ort_senden(self):
         """Ortsname (Stadt, Land) fuer das LCD an den ESP32 senden."""
@@ -403,7 +427,7 @@ class Steuerzentrale:
             return
         self.fortsetzung=None
         self.betriebsdaten_sichern("simulation",None)
-        jetzt = datetime.now().astimezone()
+        jetzt = self.standort_zeit()
         if modus == "Simulation":
             auf, unter = aktuelles_sonnenfenster(jetzt,self.werte["breite"],self.werte["laenge"])
         else:
@@ -502,7 +526,7 @@ class Steuerzentrale:
             if self.beschaeftigt:
                 return
             if self.modus == "Normalbetrieb":
-                self.simzeit = datetime.now().astimezone()
+                self.simzeit = self.standort_zeit()
             startziele = [startziel(a) for a in self.status["axes"]]
             if self.ablauf == "Startposition anfahren":
                 if self.zielpaar_fahren(startziele):

@@ -57,8 +57,9 @@ float begrenze(float wert, float unten, float oben) {
 }
 }
 
-Kalender kalenderZeit(uint32_t utc, int versatz) {
-  Zeit z = zeitAusEpoch(utc + uint32_t(versatz) * 3600u);
+Kalender kalenderZeit(uint32_t utc, int versatzMinuten) {
+  int64_t lokal = int64_t(utc) + int64_t(versatzMinuten) * 60;
+  Zeit z = zeitAusEpoch(uint32_t(lokal));
   Kalender k;
   k.jahr = z.jahr; k.monat = z.monat; k.tag = z.tag;
   k.stunde = z.stunde; k.minute = z.minute; k.sekunde = z.sekunde;
@@ -72,8 +73,9 @@ int tagesversatz(uint32_t utc) {
   return (utc >= start && utc < ende) ? 2 : 1;
 }
 
-Sonnenwerte sonnenstand(uint32_t utc, int versatz, float breite, float laenge) {
-  Zeit z = zeitAusEpoch(utc + uint32_t(versatz) * 3600u);
+Sonnenwerte sonnenstand(uint32_t utc, int versatzMinuten, float breite, float laenge) {
+  int64_t lokal = int64_t(utc) + int64_t(versatzMinuten) * 60;
+  Zeit z = zeitAusEpoch(uint32_t(lokal));
   int doy = tagImJahr(z.jahr, z.monat, z.tag);
   float stunde = z.stunde + z.minute / 60.0f + z.sekunde / 3600.0f;
   float gamma = 2.0f * PI_F / (schaltjahr(z.jahr) ? 366.0f : 365.0f) * (doy - 1 + (stunde - 12.0f) / 24.0f);
@@ -81,7 +83,7 @@ Sonnenwerte sonnenstand(uint32_t utc, int versatz, float breite, float laenge) {
   float zeitgleichung = 229.18f * (0.000075f + 0.001868f * c - 0.032077f * s - 0.014615f * cosf(2 * gamma) - 0.040849f * sinf(2 * gamma));
   float deklination = 0.006918f - 0.399912f * c + 0.070257f * s - 0.006758f * cosf(2 * gamma)
                       + 0.000907f * sinf(2 * gamma) - 0.002697f * cosf(3 * gamma) + 0.00148f * sinf(3 * gamma);
-  float sonnenzeit = fmodf(stunde * 60.0f + zeitgleichung + 4.0f * laenge - 60.0f * versatz, 1440.0f);
+  float sonnenzeit = fmodf(stunde * 60.0f + zeitgleichung + 4.0f * laenge - float(versatzMinuten), 1440.0f);
   if (sonnenzeit < 0) sonnenzeit += 1440.0f;
   float winkel = (sonnenzeit / 4.0f - 180.0f) * PI_F / 180.0f;
   float phi = breite * PI_F / 180.0f;

@@ -1,7 +1,15 @@
-# ESP32-PCSteuerung 0.6.2
+# ESP32-PCSteuerung 0.7.0
 
-Stand: 22.09.2026. Eigenstaendige Firmware fuer das [Python-Bedienfeld](../pc/README.md).
+Stand: 24.09.2026. Eigenstaendige Firmware fuer das [Python-Bedienfeld](../pc/README.md).
 Kein automatischer Motorstart; die Hauptsoftware bleibt separat erhalten.
+
+## Stand 0.7.0 (24.09.2026)
+
+Neuer Befehl `TZ <minuten>`: fester Zeitzonen-Versatz (z. B. 345 fuer Nepal,
+UTC+5:45) im NVS. `sonnenstand` und `kalenderZeit` nutzen diesen Versatz statt
+der festen EU-Sommerzeit; ohne `TZ` gilt weiterhin die EU-Regel (MEZ/MESZ).
+Status ergaenzt `tz_supported`/`tz_minuten`. Das PC-Bedienfeld sendet `TZ`
+zusammen mit `CONF`. Protokoll 3, margin=114 unveraendert.
 
 ## Stand 0.6.2 (22.09.2026)
 
@@ -277,6 +285,8 @@ Zusaetzliche Befehle:
 | `13 CONF 50.187 8.739 90.00 90.00` | Standort und Ausrichtung dauerhaft speichern |
 | `14 AUTOON` | Autonomen Betrieb aktivieren (braucht Gesamttest, `CONF`, RTC) |
 | `15 AUTOOFF` | Autonomen Betrieb deaktivieren |
+| `16 ORT <hex>` | Ortsname (16 ASCII-Zeichen) dauerhaft speichern (LCD-Wechselzeile) |
+| `17 TZ <minuten>` | Zeitzonen-Versatz in Minuten (-720 bis 840) dauerhaft speichern |
 
 Nur HELLO 3 aktiviert die Steuerung. Aeltere Clients werden abgewiesen, damit
 der ehemals manuelle SWTEST nicht unerwartet Motoren startet.

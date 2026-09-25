@@ -33,3 +33,8 @@ def vorschlag(breite, laenge):
         if best is None or d < best[0]:
             best = (d, stadt, land)
     return best[1], best[2]
+
+
+def zonenversatz(laenge):
+    """Grobe Zeitzone aus der Laenge (naechste 15 min). Nur ein Vorschlag."""
+    return round(float(laenge) / 15.0 * 4.0) / 4.0

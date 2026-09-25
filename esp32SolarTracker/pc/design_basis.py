@@ -1,4 +1,4 @@
-"""Ansicht 0.6.7, aus solartracker_ui_design1.py des Benutzers abgeleitet.
+"""Ansicht 0.7.0, aus solartracker_ui_design1.py des Benutzers abgeleitet.
 Demo-Logik entfernt; reale Aktionen implementiert bedienfeld_qt.py.
 """
 import sys
@@ -101,7 +101,7 @@ class DesignFenster(QMainWindow):
             nav_layout.addWidget(btn)
             btn.clicked.connect(lambda checked=False, index=i: self.pages.setCurrentIndex(index))
         nav_layout.addStretch()
-        hint = QLabel('Design 1\nPC-Steuerung 0.6.7')
+        hint = QLabel('Design 1\nPC-Steuerung 0.7.0')
         hint.setObjectName('muted')
         nav_layout.addWidget(hint)
         main.addWidget(nav)
@@ -311,8 +311,15 @@ class DesignFenster(QMainWindow):
         form.addWidget(self.land, 4, 1)
         form.addWidget(QLabel('Stadt'), 5, 0)
         form.addWidget(self.stadt, 5, 1)
-        form.addWidget(QLabel('Sprache'), 6, 0)
-        form.addWidget(self.lang, 6, 1)
+        self.zeitzone = QDoubleSpinBox()
+        self.zeitzone.setRange(-12.0, 14.0)
+        self.zeitzone.setDecimals(2)
+        self.zeitzone.setSingleStep(0.25)
+        self.zeitzone.setToolTip("UTC-Versatz des Standorts in Stunden (2 = Deutschland Sommer, 5.75 = Nepal)")
+        form.addWidget(QLabel('Zeitzone (UTC)'), 6, 0)
+        form.addWidget(self.zeitzone, 6, 1)
+        form.addWidget(QLabel('Sprache'), 7, 0)
+        form.addWidget(self.lang, 7, 1)
         st.addLayout(form)
         save = QPushButton('Einstellungen übernehmen')
         save.setObjectName('primary')

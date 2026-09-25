@@ -434,4 +434,17 @@ class OrtsTests(unittest.TestCase):
         self.assertIsNone(vorschlag(float("nan"),8.0))
 
 
+class ZeitzonenTests(unittest.TestCase):
+    def test_zonenversatz(self):
+        from orte import zonenversatz
+        self.assertEqual(zonenversatz(0.0),0.0)
+        self.assertEqual(zonenversatz(8.739),0.5)
+        self.assertEqual(zonenversatz(85.3),5.75)
+
+    def test_standort_zeit_nutzt_versatz(self):
+        c=Steuerzentrale()
+        c.werte["zeitzone"]=5.75
+        self.assertEqual(c.standort_zeit().utcoffset().total_seconds(),5.75*3600)
+
+
 if __name__=="__main__": unittest.main()

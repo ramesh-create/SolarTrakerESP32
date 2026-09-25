@@ -1,5 +1,19 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.7.0 / Firmware 0.7.0 / Dokumentation 0.37 - 24.09.2026
+
+- **Interaktiver 3D-Globus** (QtQuick3D/QML) auf der Simulationsseite:
+  Plexus-Textur, Gitter alle 15 Grad, roter Standort-Marker, Beschriftung
+  Name/Breite/Laenge/Ortszeit. Ziehen = drehen, Mausrad = Zoom (scharf),
+  **Klick auf die Kugel setzt den Standort**. Umschalter Karte <-> Globus;
+  die kleine Karte rechts unten bleibt flach.
+- **Zeitzone:** neues Feld "Zeitzone (UTC-Versatz)" (Vorschlag aus der Laenge).
+  Diagramm und Simulation rechnen in **Ortszeit** statt PC-Zeit (z. B. Nepal).
+  Firmware 0.7.0: Befehl `TZ <minuten>` (NVS); `sonnenstand`/`kalenderZeit`
+  nutzen den festen Versatz (Fallback EU-Sommerzeit). `CONF` sendet `TZ` mit.
+- **"Ort aus Koordinaten uebernehmen"** wandert unter die grosse Karte/den Globus.
+- 116 PC-Tests bestanden; Firmware kompiliert (343340 Byte).
+
 ## PC 0.6.7 / Dokumentation 0.36 - 22.09.2026
 
 - Offline-Ortsvorschlag: Button **„Ort vorschlagen (aus Koordinaten)"** unter den

@@ -1,4 +1,4 @@
-"""SolarTracker 0.6.7: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
+"""SolarTracker 0.7.0: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
 
 Start: python bedienfeld_qt.py. Firmware 0.4.0 / Protokoll 3: Positionen und Tests bleiben gespeichert.
 """
@@ -10,16 +10,17 @@ from PySide6.QtCore import Qt, QTimer, QEvent
 from PySide6.QtGui import QColor, QPainter, QPen, QFont, QShortcut, QKeySequence
 from PySide6.QtWidgets import (QApplication, QWidget, QLabel, QPushButton,
     QVBoxLayout, QHBoxLayout, QGridLayout, QCheckBox, QDoubleSpinBox,
-    QPlainTextEdit, QLineEdit, QMessageBox, QScrollArea, QFileDialog)
+    QPlainTextEdit, QLineEdit, QMessageBox, QScrollArea, QFileDialog, QStackedWidget)
 from serial.tools import list_ports
 from design_basis import DesignFenster
 from steuerzentrale import Steuerzentrale, STANDARD, PHASEN, grenztest_fehler, status_text
 from sonne import sonnenstand
 from tageslauf import sonnenfenster, aktuelles_sonnenfenster, panelneigung
 from weltkarte import Weltkarte
-from orte import vorschlag
+from globus import Globus
+from orte import vorschlag, zonenversatz
 
-VERSION = "0.6.7"
+VERSION = "0.7.0"
 ORDNER = Path(__file__).resolve().parent
 
 
@@ -103,6 +104,7 @@ class Bedienpanel(DesignFenster):
         self.lat.setValue(self.core.werte["breite"]); self.lon.setValue(self.core.werte["laenge"])
         self.az_null.setValue(self.core.werte["az_null"]); self.el_null.setValue(self.core.werte["el_neigung"])
         self.land.setText(self.core.werte.get("land","")); self.stadt.setText(self.core.werte.get("stadt",""))
+        self.zeitzone.setValue(self.core.werte.get("zeitzone",0.0))
         for widget in (self.lat,self.lon,self.az_null,self.el_null):
             widget.valueChanged.connect(self.einstellung_geaendert)
         self.lat.valueChanged.connect(self.ortspruefung)
@@ -228,7 +230,22 @@ class Bedienpanel(DesignFenster):
         self.weltkarte_gross=Weltkarte()
         self.weltkarte_gross.set_bearbeitbar(True)
         self.weltkarte_gross.ortGeaendert.connect(self.standort_aus_karte)
-        layout.addWidget(self.weltkarte_gross)
+        self.globus=Globus()
+        self.globus.ortGeaendert.connect(self.standort_aus_karte)
+        self.ansicht_stack=QStackedWidget()
+        self.ansicht_stack.addWidget(self.weltkarte_gross)
+        self.ansicht_stack.addWidget(self.globus)
+        umschalt=QHBoxLayout()
+        self.btn_karte=QPushButton("Karte"); self.btn_globus=QPushButton("Globus")
+        self.btn_karte.clicked.connect(lambda:self.ansicht_stack.setCurrentIndex(0))
+        self.btn_globus.clicked.connect(lambda:self.ansicht_stack.setCurrentIndex(1))
+        umschalt.addWidget(self.btn_karte); umschalt.addWidget(self.btn_globus); umschalt.addStretch()
+        layout.addLayout(umschalt)
+        layout.addWidget(self.ansicht_stack)
+        self.ort_btn=QPushButton("Ort aus Koordinaten übernehmen")
+        self.ort_btn.setToolTip("Setzt Land/Stadt auf den naechstgelegenen Ort (offline, Natural Earth) und die Zeitzone aus der Laenge")
+        self.ort_btn.clicked.connect(self.ort_vorschlagen)
+        layout.addWidget(self.ort_btn)
         note=QLabel("Nur Sonnenstunden des heutigen PC-Datums. Blau: Sonnenazimut, Orange: Sonnenhoehe (0-90 Grad).\nZuerst sichere MIN, dann Sonnenlauf, bei Sonnenuntergang Rueckfahrt zu beiden MIN.\n*Fahrzeiten kommen hinzu. Unerreichbare Sonnenziele werden an den sicheren Grenzen begrenzt.")
         note.setWordWrap(True); layout.addWidget(note)
         export=QPushButton("Tageskurve als CSV speichern"); export.clicked.connect(self.export_csv); layout.addWidget(export)
@@ -243,10 +260,6 @@ class Bedienpanel(DesignFenster):
         lay.addWidget(QLabel("Panelneigung an sicherer EL-MIN (senkrecht = 90 Grad)"),1,0); lay.addWidget(self.el_null,1,1)
         self.ausrichtung=QCheckBox("Ausrichtung geprueft: AZ+ nach Westen, EL+ kippt Richtung waagerecht")
         lay.addWidget(self.ausrichtung,2,0,1,2)
-        self.ort_btn=QPushButton("Ort vorschlagen (aus Koordinaten)")
-        self.ort_btn.setToolTip("Setzt leere Felder Land/Stadt auf den naechstgelegenen Ort (offline, Natural Earth)")
-        self.ort_btn.clicked.connect(self.ort_vorschlagen)
-        lay.addWidget(self.ort_btn,3,0,1,2)
         self.auto_cal_btn=QPushButton("Auto Kalibrierung")
         self.auto_cal_btn.clicked.connect(lambda:self.aktion(self.core.auto_kalibrierung))
         auto_card=self.card(); auto_lay=QVBoxLayout(auto_card)
@@ -494,7 +507,7 @@ class Bedienpanel(DesignFenster):
             self.hold_axis=None
             tempo=self.tempo.value()
             if duration is not None:
-                now=datetime.now().astimezone()
+                now=self.core.standort_zeit()
                 auf,unter=aktuelles_sonnenfenster(now,self.core.werte["breite"],self.core.werte["laenge"])
                 tempo=max(1,(unter-auf).total_seconds()/duration)
                 self.tempo.setValue(tempo)
@@ -544,7 +557,7 @@ class Bedienpanel(DesignFenster):
             if self.core.modus!="Pause": self.stop_all()
 
     def settings_values(self):
-        return dict(breite=self.lat.value(),laenge=self.lon.value(),az_null=self.az_null.value(),el_neigung=self.el_null.value(),land=self.land.text().strip(),stadt=self.stadt.text().strip())
+        return dict(breite=self.lat.value(),laenge=self.lon.value(),az_null=self.az_null.value(),el_neigung=self.el_null.value(),land=self.land.text().strip(),stadt=self.stadt.text().strip(),zeitzone=self.zeitzone.value())
 
     def save_settings(self):
         def action():
@@ -556,6 +569,7 @@ class Bedienpanel(DesignFenster):
     def standort_aus_karte(self,breite,laenge):
         self.lat.setValue(round(float(breite),6))
         self.lon.setValue(round(float(laenge),6))
+        self.zeitzone.setValue(zonenversatz(laenge))
         def action():
             self.core.speichern(self.datenordner/"einstellungen.json",self.settings_values())
             self.chart.berechnen(self.core.simzeit,self.core.werte)
@@ -574,11 +588,14 @@ class Bedienpanel(DesignFenster):
         stadt,land=v
         self.stadt.setText(stadt)
         self.land.setText(land)
-        self.protokoll(f"Ortsvorschlag gesetzt: {stadt}, {land}")
+        self.zeitzone.setValue(zonenversatz(self.lon.value()))
+        self.protokoll(f"Ortsvorschlag gesetzt: {stadt}, {land} (Zeitzone UTC{self.zeitzone.value():+g})")
 
     def ortspruefung(self,*_):
         if not self.land.text().strip() and not self.stadt.text().strip():
-            self.ort_vorschlagen()
+            v=vorschlag(self.lat.value(),self.lon.value())
+            if v:
+                self.stadt.setText(v[0]); self.land.setText(v[1])
 
     def grenzen_geaendert(self,*_):
         okay=bool(self.core.status and all(a["limits_ok"] for a in self.core.status["axes"]))
@@ -693,6 +710,8 @@ class Bedienpanel(DesignFenster):
         for karte in (getattr(self,"weltkarte_klein",None),getattr(self,"weltkarte_gross",None)):
             if karte is not None:
                 karte.set_ort(lat,lon,name)
+        if getattr(self,"globus",None) is not None:
+            self.globus.set_ort(lat,lon,name,self.core.standort_zeit().strftime("%H:%M:%S"))
         fehler=c.freigabe(); self.freigabe_label.setText("Start gesperrt:\n"+"\n".join(fehler[:4]) if fehler else "Alle Startprüfungen OK")
         farbe="#208447" if not fehler and n and n.get("auto_ok",False) else "#101010"
         for knopf in [self.btn_oper,self.btn_sim,self.operation_btn,self.sim_start,self.sim_neu,*self.sim_buttons]:

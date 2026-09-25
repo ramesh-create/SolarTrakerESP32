@@ -1,5 +1,15 @@
 # Changelog
 
+## PC 0.7.0 / Firmware 0.7.0 / Dokumentation 0.37 - 24.09.2026
+
+- Interaktiver 3D-Globus (QtQuick3D/QML): Plexus-Textur, Gitter, Marker mit
+  Breite/Laenge/Ortszeit, drehen/zoomen, Klick setzt Standort. Umschalter
+  Karte <-> Globus.
+- Zeitzone (UTC-Versatz, Vorschlag aus Laenge): Diagramm/Simulation in Ortszeit;
+  Firmware 0.7.0 `TZ <minuten>` in NVS, `CONF` sendet mit.
+- Button "Ort aus Koordinaten uebernehmen" unter die grosse Karte/den Globus.
+- 116 PC-Tests OK.
+
 ## PC 0.6.7 / Dokumentation 0.36 - 22.09.2026
 
 - Offline-Ortsvorschlag: Button „Ort vorschlagen (aus Koordinaten)" setzt

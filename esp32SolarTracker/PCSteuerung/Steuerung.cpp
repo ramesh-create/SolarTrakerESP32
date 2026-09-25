@@ -1,4 +1,4 @@
-// Version 0.6.2. Eingabe: zeilenweise PC-Befehle. Ausgabe: JSON-Zeilen.
+// Version 0.7.0. Eingabe: zeilenweise PC-Befehle. Ausgabe: JSON-Zeilen.
 // Beispiel: 1 HELLO 3\n, 2 PING\n, 3 STATUS\n. Protokoll siehe README.
 #include "Steuerung.h"
 #include <Arduino.h>
@@ -56,11 +56,14 @@ float confBreite=0, confLaenge=0, confAzNull=90, confElNeigung=90;
 unsigned long zielZeit=0;
 int zielAz=-1, zielEl=-1;
 char ortText[17]="";
+int tzMinuten=0;
+bool tzGesetzt=false;
 void autonomAktualisieren();
 RTC_DS3231 rtc;
 bool rtcVorhanden = false, rtcGueltig = false;
 uint32_t rtcSekunden = 0;
 unsigned long rtcZeit = 0;
+int zeitversatz() { return tzGesetzt ? tzMinuten : tagesversatz(rtcSekunden) * 60; }
 unsigned long ping = 0, statusZeit = 0, lcdZeit = 0, lcdManuellBis = 0;
 char zeile[100];
 size_t laenge = 0;
@@ -131,11 +134,11 @@ void status() {
   if (confOK) snprintf(conf, sizeof(conf), ",\"lat\":%.3f,\"lon\":%.3f,\"az_null\":%.2f,\"el_neigung\":%.2f", confBreite, confLaenge, confAzNull, confElNeigung);
   int sunAz = -1, sunEl = -1;
   if (confOK && rtcGueltig && achsen[0].referenz && achsen[0].grenzenOK && achsen[1].referenz && achsen[1].grenzenOK) {
-    Sonnenwerte w = sonnenstand(rtcSekunden, tagesversatz(rtcSekunden), confBreite, confLaenge);
+    Sonnenwerte w = sonnenstand(rtcSekunden, zeitversatz(), confBreite, confLaenge);
     if (w.hoehe <= 0) { sunAz = ABSTAND; sunEl = ABSTAND; }
     else { sunAz = zielAzimut(w, confAzNull, achsen[0].spanne, ABSTAND); sunEl = zielElevation(w.hoehe, confElNeigung, achsen[1].spanne, ABSTAND); }
   }
-  Serial.printf("{\"type\":\"status\",\"protocol\":3,\"version\":\"0.6.2\",\"switch_test\":%d,\"switch_testing\":%s,\"rtc_present\":%s,\"rtc_valid\":%s,\"rtc_epoch\":%lu,\"axes\":[",
+  Serial.printf("{\"type\":\"status\",\"protocol\":3,\"version\":\"0.7.0\",\"switch_test\":%d,\"switch_testing\":%s,\"rtc_present\":%s,\"rtc_valid\":%s,\"rtc_epoch\":%lu,\"axes\":[",
     schalterTest.index, schalterTest.aktiv ? "true" : "false", rtcVorhanden ? "true" : "false", rtcGueltig ? "true" : "false", (unsigned long)(rtcGueltig ? rtcSekunden + (millis()-rtcZeit)/1000 : 0));
   for (int i = 0; i < 2; ++i) {
     auto& a = achsen[i];
@@ -143,7 +146,7 @@ void status() {
       i ? "," : "", a.position, a.spanne, a.spanne > 0 ? "true" : "false",
       a.referenz ? "true" : "false", int(a.zustand), minAktiv(a) ? "true" : "false", maxAktiv(a) ? "true" : "false", a.grenzenOK ? "true" : "false", (unsigned long)a.generation);
   }
-  Serial.printf("],\"auto_supported\":true,\"auto_testing\":%s,\"auto_ok\":%s,\"auto_message\":\"%s\",\"auto_mode\":%s,\"conf_ok\":%s%s,\"sun_az\":%d,\"sun_el\":%d,\"device_id\":\"%012llx\",\"position_storage\":true,\"storage_ok\":%s,\"lcd_supported\":true,\"lcd_present\":%s,\"ort_supported\":true}\n", autoPhase ? "true" : "false", autoOK && freigegeben() ? "true" : "false", autoMeldung, autoModus ? "true" : "false", confOK ? "true" : "false", conf, sunAz, sunEl, (unsigned long long)ESP.getEfuseMac(), speicherOK ? "true" : "false", lcdErreichbar() ? "true" : "false");
+  Serial.printf("],\"auto_supported\":true,\"auto_testing\":%s,\"auto_ok\":%s,\"auto_message\":\"%s\",\"auto_mode\":%s,\"conf_ok\":%s%s,\"sun_az\":%d,\"sun_el\":%d,\"device_id\":\"%012llx\",\"position_storage\":true,\"storage_ok\":%s,\"lcd_supported\":true,\"lcd_present\":%s,\"ort_supported\":true,\"tz_supported\":true,\"tz_minuten\":%d}\n", autoPhase ? "true" : "false", autoOK && freigegeben() ? "true" : "false", autoMeldung, autoModus ? "true" : "false", confOK ? "true" : "false", conf, sunAz, sunEl, (unsigned long long)ESP.getEfuseMac(), speicherOK ? "true" : "false", lcdErreichbar() ? "true" : "false", int(tzMinuten));
 }
 // Live-Anzeige: Zeit + Status/Aktion (Zeile 1), Azimut + Panelneigung (Zeile 2).
 const char* kurzStatus(const Achse& a) {
@@ -168,7 +171,7 @@ void lcdStatus() {
   ++wechsel;
   char oben[17], unten[17];
   if (rtcGueltig) {
-    Kalender k = kalenderZeit(rtcSekunden, tagesversatz(rtcSekunden));
+    Kalender k = kalenderZeit(rtcSekunden, zeitversatz());
     snprintf(oben, sizeof(oben), "%02d.%02d.%02d %02d:%02d", k.tag, k.monat, k.jahr % 100, k.stunde, k.minute);
   } else {
     snprintf(oben, sizeof(oben), "--.--.-- --:--");
@@ -383,7 +386,7 @@ void autoWeiter() {
 // Sonnenziel aus RTC und Konfiguration; unter dem Horizont an sichere MIN parken.
 void autonomesZiel() {
   if (!rtcGueltig || !confOK) return;
-  Sonnenwerte w = sonnenstand(rtcSekunden, tagesversatz(rtcSekunden), confBreite, confLaenge);
+  Sonnenwerte w = sonnenstand(rtcSekunden, zeitversatz(), confBreite, confLaenge);
   if (w.hoehe <= 0) { zielAz = ABSTAND; zielEl = ABSTAND; }
   else {
     zielAz = zielAzimut(w, confAzNull, achsen[0].spanne, ABSTAND);
@@ -481,6 +484,13 @@ void befehl() {
     for (int i = 0; i < 16; ++i) ortText[i] = char(hexZiffer(arg1[2*i]) * 16 + hexZiffer(arg1[2*i+1]));
     ortText[16] = 0;
     if (speicherOK) speicher.putString("ort", ortText);
+    antwort(id); status(); return;
+  }
+  if (!strcmp(cmd, "TZ") && arg1 && !arg2) {
+    double minuten;
+    if (!zahl(arg1, minuten) || floor(minuten) != minuten || minuten < -720 || minuten > 840) { antwort(id, "TZ: Minuten -720 bis 840 (UTC-12 bis +14)"); return; }
+    tzMinuten = int(minuten); tzGesetzt = true;
+    if (speicherOK) speicher.putInt("tz", tzMinuten);
     antwort(id); status(); return;
   }
   if (!strcmp(cmd, "TIME") && arg1 && !arg2) {
@@ -591,6 +601,8 @@ void steuerungStarten() {
     String o = speicher.getString("ort", "");
     snprintf(ortText, sizeof(ortText), "%s", o.c_str());
   }
+  tzGesetzt = speicherOK && speicher.isKey("tz");
+  if (tzGesetzt) tzMinuten = speicher.getInt("tz", 0);
   if (autoOK) autoAnzeige("Tests gespeichert",freigegeben() && rtcGueltig?"Normalbetr.bereit":"Freigabe fehlt");
   status();
 }
