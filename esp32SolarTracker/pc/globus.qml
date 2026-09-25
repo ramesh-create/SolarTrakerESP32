@@ -26,6 +26,11 @@ Item {
         gestell.eulerRotation.x = -markerLat
     }
 
+    function resetAnsicht() {
+        root.zoomFaktor = 1.0
+        zeigeStandort()
+    }
+
     onMarkerLatChanged: zeigeStandort()
     onMarkerLonChanged: zeigeStandort()
     Component.onCompleted: zeigeStandort()
@@ -90,8 +95,8 @@ Item {
         property real startX: 0
         onActiveChanged: if (active) { startY = gestell.eulerRotation.y; startX = gestell.eulerRotation.x }
         onTranslationChanged: {
-            gestell.eulerRotation.y = startY + translation.x * 0.35
-            gestell.eulerRotation.x = Math.max(-89, Math.min(89, startX + translation.y * 0.35))
+            gestell.eulerRotation.y = startY - translation.x * 0.35
+            gestell.eulerRotation.x = Math.max(-89, Math.min(89, startX - translation.y * 0.35))
         }
     }
 
@@ -99,6 +104,7 @@ Item {
         onWheel: function (event) {
             var f = Math.pow(1.0016, event.angleDelta.y)
             root.zoomFaktor = Math.max(0.5, Math.min(3.2, root.zoomFaktor * f))
+            event.accepted = true
         }
     }
 

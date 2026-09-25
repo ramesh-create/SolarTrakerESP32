@@ -30,3 +30,13 @@ class Globus(QQuickWidget):
         root.setProperty("markerLon", float(laenge))
         root.setProperty("ortName", str(name))
         root.setProperty("ortZeit", str(zeit))
+
+    def reset_ansicht(self):
+        root = self.rootObject()
+        if root is not None:
+            root.resetAnsicht()
+
+    def wheelEvent(self, event):
+        # Zoom nur auf der Kugel; nicht an den umgebenden Scrollbereich weitergeben.
+        super().wheelEvent(event)
+        event.accept()

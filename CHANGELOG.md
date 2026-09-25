@@ -1,5 +1,11 @@
 # Changelog
 
+## PC 0.7.2 / Dokumentation 0.39 - 24.09.2026
+
+- Kugel: Drehrichtung korrigiert, Mausrad zoomt nur die Kugel (kein Scrollen der
+  Seite), Doppelklick auf Karte ODER Kugel setzt die Panel-Position. Button
+  "Ansicht zuruecksetzen" unten rechts. 116 PC-Tests bestanden.
+
 ## PC 0.7.1 / Dokumentation 0.38 - 24.09.2026
 
 - Globus verbessert: Drehen korrigiert (ruhig), groessere Kugel, geschmeidiger

@@ -1,6 +1,6 @@
-# SolarTracker PC-Bedienfeld 0.7.1 - Design 1
+# SolarTracker PC-Bedienfeld 0.7.2 - Design 1
 
-Dokumentation 0.38, 24.09.2026. Start: `Start.cmd` doppelt anklicken.
+Dokumentation 0.39, 24.09.2026. Start: `Start.cmd` doppelt anklicken.
 Das alte Bedienfenster zuvor schliessen. Fuer die echte LCD-Uebertragung ist Firmware 0.3.2 / Protokoll 3 erforderlich.
 Firmware 0.3.1 bleibt fuer Motoren und RTC kompatibel. Python, pyserial und PySide6 sind in `.venv` installiert.
 
@@ -136,14 +136,16 @@ Das LCD zeigt **Datum und lokale Zeit** (`TT.MM.JJ HH:MM`). Zeile 2 wechselt
 alle 3 s zwischen Winkeln (`Az### Ng##`) und Status (`Autonom`/`PC-Bereit`/
 `Bereit`); waehrend einer Fahrt steht dort die Aktion.
 
-## Globus (PC 0.7.1)
+## Globus (PC 0.7.2)
 
 Auf der Simulationsseite gibt es einen Umschalter **Karte <-> Globus**. Der
 **Globus** (QtQuick3D) zeigt die Plexus-Weltkarte als grosse Kugel mit Gitter
 (Breiten-/Laengengrade alle 15 Grad) und rotem Standort-Marker; Beschriftung:
-Name, Breite, Laenge, Ortszeit. **Ziehen** dreht ruhig, **Mausrad** zoomt
-geschmeidig (scharf), **Doppelklick auf die Kugel** setzt den Standort. Die
-kleine Karte rechts unten bleibt flach.
+Name, Breite, Laenge, Ortszeit. **Ziehen** dreht natuerlich, **Mausrad** zoomt
+nur die Kugel (die Seite scrollt nicht), **Doppelklick auf Karte ODER Kugel**
+setzt die Panel-Position (roter Punkt springt). Ein Button
+**"Ansicht zuruecksetzen"** liegt unten rechts. Die kleine Karte rechts unten
+bleibt flach.
 
 ## Zeitzone (PC 0.7.0 / Firmware 0.7.0)
 

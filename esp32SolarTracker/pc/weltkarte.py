@@ -139,10 +139,13 @@ class Weltkarte(QWidget):
             self.ortGeaendert.emit(self.breite, self.laenge)
 
     def mouseDoubleClickEvent(self, event):
-        if self.bearbeitbar:
-            self.reset_ansicht()
-        else:
-            super().mouseDoubleClickEvent(event)
+        if not self.bearbeitbar:
+            return super().mouseDoubleClickEvent(event)
+        anteil = self.maus_bildanteil(event.position())
+        if anteil:
+            self.breite, self.laenge = ort_aus_bildanteil(*anteil)
+            self.ortGeaendert.emit(self.breite, self.laenge)
+            self.update()
 
     def wheelEvent(self, event):
         if not self.bearbeitbar:
@@ -158,6 +161,7 @@ class Weltkarte(QWidget):
         self.ansicht = QRectF(anteil[0] - relx * nw, anteil[1] - rely * nw, nw, nw)
         self._begrenzen()
         self.update()
+        event.accept()
 
     # --- Zeichnen -------------------------------------------------------------
     def paintEvent(self, event):

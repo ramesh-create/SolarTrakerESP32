@@ -1,4 +1,4 @@
-"""SolarTracker 0.7.1: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
+"""SolarTracker 0.7.2: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
 
 Start: python bedienfeld_qt.py. Firmware 0.4.0 / Protokoll 3: Positionen und Tests bleiben gespeichert.
 """
@@ -20,7 +20,7 @@ from weltkarte import Weltkarte
 from globus import Globus
 from orte import vorschlag, zonenversatz
 
-VERSION = "0.7.1"
+VERSION = "0.7.2"
 ORDNER = Path(__file__).resolve().parent
 
 
@@ -241,7 +241,14 @@ class Bedienpanel(DesignFenster):
         self.btn_globus.clicked.connect(lambda:self.ansicht_stack.setCurrentIndex(1))
         umschalt.addWidget(self.btn_karte); umschalt.addWidget(self.btn_globus); umschalt.addStretch()
         layout.addLayout(umschalt)
-        layout.addWidget(self.ansicht_stack)
+        kartenbereich=QWidget(); grid=QGridLayout(kartenbereich); grid.setContentsMargins(0,0,0,0)
+        grid.addWidget(self.ansicht_stack,0,0)
+        self.reset_btn=QPushButton("Ansicht zurücksetzen")
+        self.reset_btn.setObjectName("primary")
+        self.reset_btn.setToolTip("Zoom und Drehung von Karte/Globus zurücksetzen")
+        self.reset_btn.clicked.connect(self.ansicht_reset)
+        grid.addWidget(self.reset_btn,0,0,Qt.AlignRight|Qt.AlignBottom)
+        layout.addWidget(kartenbereich)
         self.ort_btn=QPushButton("Ort aus Koordinaten übernehmen")
         self.ort_btn.setToolTip("Setzt Land/Stadt auf den naechstgelegenen Ort (offline, Natural Earth) und die Zeitzone aus der Laenge")
         self.ort_btn.clicked.connect(self.ort_vorschlagen)
@@ -596,6 +603,10 @@ class Bedienpanel(DesignFenster):
             v=vorschlag(self.lat.value(),self.lon.value())
             if v:
                 self.stadt.setText(v[0]); self.land.setText(v[1])
+
+    def ansicht_reset(self):
+        self.weltkarte_gross.reset_ansicht()
+        self.globus.reset_ansicht()
 
     def grenzen_geaendert(self,*_):
         okay=bool(self.core.status and all(a["limits_ok"] for a in self.core.status["axes"]))

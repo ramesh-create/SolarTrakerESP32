@@ -1,5 +1,14 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.7.2 / Dokumentation 0.39 - 24.09.2026
+
+- Kugel: **Drehrichtung korrigiert** (natuerliches Greifen), **Mausrad zoomt nur
+  die Kugel** (die Seite scrollt nicht mehr), **Doppelklick auf Karte ODER Kugel**
+  setzt die Panel-Position (roter Punkt springt, speichern + Ausrichtung +
+  `CONF`/`ORT`/`TZ`). Marker-Ziehen auf der Karte bleibt.
+- Neuer Button **"Ansicht zuruecksetzen"** unten rechts auf Karte/Globus.
+- 116 PC-Tests bestanden.
+
 ## PC 0.7.1 / Dokumentation 0.38 - 24.09.2026
 
 - Globus verbessert: **Drehen korrigiert** (absolute Drehung ab Drag-Start statt
