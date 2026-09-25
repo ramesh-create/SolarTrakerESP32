@@ -1,5 +1,12 @@
 # Changelog
 
+## PC 0.7.5 / Dokumentation 0.42 - 24.09.2026
+
+- Karte/Globus exakt kalibriert: Plexus-Bild (nicht randgenau) ersetzt durch
+  selbst erzeugte equirectangular Karte aus Natural Earth 50m Land (public
+  domain), dunkler Tech-Look; alte Karte als weltkarte_plexus.png. Marker/Klick
+  sitzen exakt. 116 PC-Tests bestanden.
+
 ## PC 0.7.4 / Dokumentation 0.41 - 24.09.2026
 
 - Globus-Doppelklick ohne `pick` geloest (analytische Ray-Sphere aus der Kamera);

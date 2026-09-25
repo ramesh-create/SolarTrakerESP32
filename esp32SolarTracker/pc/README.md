@@ -1,6 +1,6 @@
-# SolarTracker PC-Bedienfeld 0.7.4 - Design 1
+# SolarTracker PC-Bedienfeld 0.7.5 - Design 1
 
-Dokumentation 0.41, 24.09.2026. Start: `Start.cmd` doppelt anklicken.
+Dokumentation 0.42, 24.09.2026. Start: `Start.cmd` doppelt anklicken.
 Das alte Bedienfenster zuvor schliessen. Fuer die echte LCD-Uebertragung ist Firmware 0.3.2 / Protokoll 3 erforderlich.
 Firmware 0.3.1 bleibt fuer Motoren und RTC kompatibel. Python, pyserial und PySide6 sind in `.venv` installiert.
 
@@ -103,12 +103,14 @@ Der Punkt wird aus Breite/Laenge berechnet (equirectangular:
 - **Grosse Karte interaktiv:** **Mausrad** = Zoom (bis 16x, cursorzentriert),
   **Ziehen** ausserhalb des Markers = Karte verschieben (Pan), **Doppelklick** =
   Ansicht zuruecksetzen.
-- **Standort ziehen:** Marker greifen und verschieben. Beim Loslassen werden
-  Breite/Laenge gesetzt, gespeichert, die Ausrichtung neu bestaetigt und (wenn
-  verbunden) `CONF` an den ESP32 gesendet. Das Ziehen stoppt einen laufenden
-  Betrieb. Die kleine Karte rechts unten bleibt reine Anzeige.
-- Quelle: `pc/weltkarte.png` – vom Nutzer bereitgestellte **Plexus-Weltkarte**,
-  2:1, dunkler Hintergrund, equirectangular. Offline, kein Netz.
+- **Standort waehlen:** **Doppelklick** auf Karte oder Globus setzt die Position
+  (Marker springt), Felder Breite/Laenge/Zeitzone/Land/Stadt werden gesetzt,
+  gespeichert, die Ausrichtung bestaetigt und (wenn verbunden) `CONF`+`ORT`+`TZ`
+  gesendet. Auf der flachen Karte kann der Marker zusaetzlich gezogen werden.
+  Die kleine Karte rechts unten bleibt reine Anzeige.
+- Quelle: `pc/weltkarte.png` – selbst erzeugte, **exakt equirectangular Karte**
+  (4096x2048) aus **Natural Earth 50m Land** (public domain), dunkler Tech-Look.
+  Die alte Plexus-Karte liegt als `weltkarte_plexus.png`. Offline, kein Netz.
 - Neues Modul `weltkarte.py` (Projektion, Zoom/Pan, Drag & Drop).
 
 ## Ortsangabe (PC 0.6.7 / Firmware 0.6.2)
@@ -136,10 +138,10 @@ Das LCD zeigt **Datum und lokale Zeit** (`TT.MM.JJ HH:MM`). Zeile 2 wechselt
 alle 3 s zwischen Winkeln (`Az### Ng##`) und Status (`Autonom`/`PC-Bereit`/
 `Bereit`); waehrend einer Fahrt steht dort die Aktion.
 
-## Globus (PC 0.7.4)
+## Globus (PC 0.7.5)
 
 Auf der Simulationsseite gibt es einen Umschalter **Karte <-> Globus**. Der
-**Globus** (QtQuick3D) zeigt die Plexus-Weltkarte als grosse Kugel mit Gitter
+**Globus** (QtQuick3D) zeigt die equirectangular Weltkarte als grosse Kugel mit Gitter
 (Breiten-/Laengengrade alle 15 Grad) und rotem Standort-Marker; Beschriftung:
 Name, Breite, Laenge, Ortszeit. **Ziehen** dreht natuerlich, **Mausrad** zoomt
 nur die Kugel (die Seite scrollt nicht), **Doppelklick auf Karte ODER Kugel**

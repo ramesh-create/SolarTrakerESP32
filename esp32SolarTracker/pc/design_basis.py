@@ -1,4 +1,4 @@
-"""Ansicht 0.7.4, aus solartracker_ui_design1.py des Benutzers abgeleitet.
+"""Ansicht 0.7.5, aus solartracker_ui_design1.py des Benutzers abgeleitet.
 Demo-Logik entfernt; reale Aktionen implementiert bedienfeld_qt.py.
 """
 import sys
@@ -101,7 +101,7 @@ class DesignFenster(QMainWindow):
             nav_layout.addWidget(btn)
             btn.clicked.connect(lambda checked=False, index=i: self.pages.setCurrentIndex(index))
         nav_layout.addStretch()
-        hint = QLabel('Design 1\nPC-Steuerung 0.7.4')
+        hint = QLabel('Design 1\nPC-Steuerung 0.7.5')
         hint.setObjectName('muted')
         nav_layout.addWidget(hint)
         main.addWidget(nav)

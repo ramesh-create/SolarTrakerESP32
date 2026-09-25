@@ -1,5 +1,16 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.7.5 / Dokumentation 0.42 - 24.09.2026
+
+- **Karte/Globus exakt kalibriert:** Das Plexus-Bild war nicht genau auf
+  `-180..180 / 90..-90` kalibriert (Versatz -> falsche Ortsnamen an der
+  Klickstelle). Es wurde durch eine **selbst erzeugte, exakte equirectangular
+  Karte** (4096x2048) aus **Natural Earth 50m Land** (public domain) im dunklen
+  Tech-Look ersetzt. Die alte Plexus-Karte liegt als `weltkarte_plexus.png`.
+- Marker und Klick auf Karte und Globus sitzen jetzt exakt; Doppelklick setzt
+  Standort + Land/Stadt korrekt.
+- 116 PC-Tests bestanden.
+
 ## PC 0.7.4 / Dokumentation 0.41 - 24.09.2026
 
 - **Globus-Doppelklick ohne `pick`** geloest: Die Position wird **analytisch aus
