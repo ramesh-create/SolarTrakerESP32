@@ -1,5 +1,12 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.7.6 / Dokumentation 0.43 - 24.09.2026
+
+- Der **Ortsname steht jetzt direkt am roten Marker** auf dem Globus (wie auf der
+  Karte); oben links nur noch Breite/Laenge/Ortszeit. Position ueber
+  `View3D.mapFrom3DScene`; auf der Kugelrueckseite wird das Label ausgeblendet.
+- 116 PC-Tests bestanden.
+
 ## PC 0.7.5 / Dokumentation 0.42 - 24.09.2026
 
 - **Karte/Globus exakt kalibriert:** Das Plexus-Bild war nicht genau auf

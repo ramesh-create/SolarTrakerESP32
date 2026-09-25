@@ -1,5 +1,10 @@
 # Changelog
 
+## PC 0.7.6 / Dokumentation 0.43 - 24.09.2026
+
+- Ortsname erscheint direkt am roten Marker auf dem Globus (wie auf der Karte);
+  oben links nur Breite/Laenge/Ortszeit. 116 PC-Tests bestanden.
+
 ## PC 0.7.5 / Dokumentation 0.42 - 24.09.2026
 
 - Karte/Globus exakt kalibriert: Plexus-Bild (nicht randgenau) ersetzt durch

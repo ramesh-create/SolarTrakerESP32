@@ -1,4 +1,4 @@
-"""PC-Steuerung 0.7.5: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
+"""PC-Steuerung 0.7.6: Hardwarezustand, Prueffreigaben und NOAA-Nachfuehrung.
 
 GUI-unabhaengig. Eingabe: Bedienbefehle und Protokoll 3; Ausgabe: Status/Ereignisse.
 Keine simulierten Endschalter oder Motor-Istwerte. Poll muss alle 50 ms laufen.

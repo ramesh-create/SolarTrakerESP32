@@ -78,6 +78,7 @@ Item {
     View3D {
         id: view
         anchors.fill: parent
+        camera: kamera
         environment: SceneEnvironment {
             clearColor: "#0d1117"
             backgroundMode: SceneEnvironment.Color
@@ -157,10 +158,33 @@ Item {
         anchors.top: parent.top
         anchors.margins: 10
         spacing: 2
-        Text { text: root.ortName; color: "#e7edf5"; font.bold: true; font.pixelSize: 14 }
         Text { text: "Breite: " + root.markerLat.toFixed(3) + "\u00B0"; color: "#3aa6ff"; font.pixelSize: 13 }
         Text { text: "Laenge: " + root.markerLon.toFixed(3) + "\u00B0"; color: "#3aa6ff"; font.pixelSize: 13 }
         Text { text: "Ortszeit: " + root.ortZeit; color: "#97a8bb"; font.pixelSize: 12 }
         Text { text: "Ziehen = drehen, Rad = Zoom, Doppelklick = Standort"; color: "#697b8e"; font.pixelSize: 11 }
+    }
+
+    Text {
+        id: markerLabel
+        text: root.ortName
+        color: "#ffffff"
+        font.bold: true
+        font.pixelSize: 13
+        // Marker auf der Rueckseite ausblenden
+        visible: text !== "" && (function () {
+            var P = root.posAufKugel(root.markerLat, root.markerLon)
+            var C = root.kameraPosition()
+            return (P.x * C.x + P.y * C.y + P.z * C.z) > 0
+        })()
+        x: {
+            root.viewYaw; root.viewPitch; root.zoomFaktor; view.width; view.height
+            var p = view.mapFrom3DScene(root.posAufKugel(root.markerLat, root.markerLon))
+            return Math.max(2, Math.min(view.width - width - 2, p.x + 10))
+        }
+        y: {
+            root.viewYaw; root.viewPitch; root.zoomFaktor; view.width; view.height
+            var p = view.mapFrom3DScene(root.posAufKugel(root.markerLat, root.markerLon))
+            return Math.max(2, Math.min(view.height - height - 2, p.y - 8))
+        }
     }
 }
