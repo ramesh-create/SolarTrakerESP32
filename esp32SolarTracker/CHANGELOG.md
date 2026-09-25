@@ -1,5 +1,14 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.7.4 / Dokumentation 0.41 - 24.09.2026
+
+- **Globus-Doppelklick ohne `pick`** geloest: Die Position wird **analytisch aus
+  der Kamera** berechnet (Ray-Sphere), unabhaengig von Renderer/`pick`. Damit
+  funktioniert der Klick auf die Kugel zuverlaessig und setzt Standort +
+  Land/Stadt (Marker springt).
+- Verifiziert: analytischer Klick exakt (Mittelpunkt -> Standort); flache Karte
+  korrekt kalibriert. 116 PC-Tests bestanden.
+
 ## PC 0.7.3 / Dokumentation 0.40 - 24.09.2026
 
 - **Globus-Doppelklick repariert**: Eingabe laeuft jetzt ueber eine `MouseArea`

@@ -1,5 +1,10 @@
 # Changelog
 
+## PC 0.7.4 / Dokumentation 0.41 - 24.09.2026
+
+- Globus-Doppelklick ohne `pick` geloest (analytische Ray-Sphere aus der Kamera);
+  Klick auf Kugel/Karte setzt Standort + Land/Stadt. 116 PC-Tests bestanden.
+
 ## PC 0.7.3 / Dokumentation 0.40 - 24.09.2026
 
 - Globus-Doppelklick repariert (MouseArea); Doppelklick auf Karte oder Kugel
