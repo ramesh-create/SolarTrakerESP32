@@ -89,28 +89,24 @@ Item {
         }
     }
 
-    DragHandler {
-        target: null
-        property real startY: 0
-        property real startX: 0
-        onActiveChanged: if (active) { startY = gestell.eulerRotation.y; startX = gestell.eulerRotation.x }
-        onTranslationChanged: {
-            gestell.eulerRotation.y = startY - translation.x * 0.35
-            gestell.eulerRotation.x = Math.max(-89, Math.min(89, startX - translation.y * 0.35))
+    MouseArea {
+        anchors.fill: parent
+        property real pressX: 0
+        property real pressY: 0
+        property real startYaw: 0
+        property real startPitch: 0
+        onPressed: function (mouse) {
+            pressX = mouse.x; pressY = mouse.y
+            startYaw = gestell.eulerRotation.y; startPitch = gestell.eulerRotation.x
         }
-    }
-
-    WheelHandler {
-        onWheel: function (event) {
-            var f = Math.pow(1.0016, event.angleDelta.y)
-            root.zoomFaktor = Math.max(0.5, Math.min(3.2, root.zoomFaktor * f))
-            event.accepted = true
+        onPositionChanged: function (mouse) {
+            if (!pressed)
+                return
+            gestell.eulerRotation.y = startYaw - (mouse.x - pressX) * 0.35
+            gestell.eulerRotation.x = Math.max(-89, Math.min(89, startPitch - (mouse.y - pressY) * 0.35))
         }
-    }
-
-    TapHandler {
-        onDoubleTapped: function (eventPoint) {
-            var r = view.pick(eventPoint.position.x, eventPoint.position.y)
+        onDoubleClicked: function (mouse) {
+            var r = view.pick(mouse.x, mouse.y)
             if (r.objectHit) {
                 var p = r.position
                 var len = Math.sqrt(p.x*p.x + p.y*p.y + p.z*p.z)
@@ -122,6 +118,11 @@ Item {
                 while (lon < -180) lon += 360
                 root.ortGeklickt(lat, lon)
             }
+        }
+        onWheel: function (wheel) {
+            var f = Math.pow(1.0016, wheel.angleDelta.y)
+            root.zoomFaktor = Math.max(0.5, Math.min(3.2, root.zoomFaktor * f))
+            wheel.accepted = true
         }
     }
 

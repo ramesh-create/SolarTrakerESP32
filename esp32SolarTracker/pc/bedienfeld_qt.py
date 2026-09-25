@@ -1,4 +1,4 @@
-"""SolarTracker 0.7.2: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
+"""SolarTracker 0.7.3: Benutzervorlage Design 1 mit echter ESP32-Anbindung.
 
 Start: python bedienfeld_qt.py. Firmware 0.4.0 / Protokoll 3: Positionen und Tests bleiben gespeichert.
 """
@@ -20,7 +20,7 @@ from weltkarte import Weltkarte
 from globus import Globus
 from orte import vorschlag, zonenversatz
 
-VERSION = "0.7.2"
+VERSION = "0.7.3"
 ORDNER = Path(__file__).resolve().parent
 
 
@@ -577,6 +577,9 @@ class Bedienpanel(DesignFenster):
         self.lat.setValue(round(float(breite),6))
         self.lon.setValue(round(float(laenge),6))
         self.zeitzone.setValue(zonenversatz(laenge))
+        v=vorschlag(breite,laenge)
+        if v:
+            self.stadt.setText(v[0]); self.land.setText(v[1])
         def action():
             self.core.speichern(self.datenordner/"einstellungen.json",self.settings_values())
             self.chart.berechnen(self.core.simzeit,self.core.werte)

@@ -1,5 +1,11 @@
 # Changelog
 
+## PC 0.7.3 / Dokumentation 0.40 - 24.09.2026
+
+- Globus-Doppelklick repariert (MouseArea); Doppelklick auf Karte oder Kugel
+  setzt die Panel-Position und zusaetzlich Land/Stadt (naechster Ort), sodass
+  der Name auf Karte UND Globus erscheint. 116 PC-Tests bestanden.
+
 ## PC 0.7.2 / Dokumentation 0.39 - 24.09.2026
 
 - Kugel: Drehrichtung korrigiert, Mausrad zoomt nur die Kugel (kein Scrollen der

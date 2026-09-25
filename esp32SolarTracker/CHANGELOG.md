@@ -1,5 +1,14 @@
 # Aenderungsprotokoll ESP32
 
+## PC 0.7.3 / Dokumentation 0.40 - 24.09.2026
+
+- **Globus-Doppelklick repariert**: Eingabe laeuft jetzt ueber eine `MouseArea`
+  (vorher Konflikt DragHandler/TapHandler) -> Doppelklick auf **Karte oder Kugel**
+  setzt die Panel-Position; der rote Punkt springt.
+- Doppelklick setzt zusaetzlich **Land/Stadt** auf den naechstgelegenen Ort,
+  sodass Name/Breite/Laenge auf **Karte und Globus** angezeigt werden.
+- 116 PC-Tests bestanden; QML fehlerfrei geladen.
+
 ## PC 0.7.2 / Dokumentation 0.39 - 24.09.2026
 
 - Kugel: **Drehrichtung korrigiert** (natuerliches Greifen), **Mausrad zoomt nur

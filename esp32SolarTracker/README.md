@@ -1,6 +1,6 @@
 # esp32SolarTracker
 
-Dokumentationsstand: **0.39 vom 24.09.2026**. PC-Bedienfeld: **0.7.2**, Firmware: **0.7.0**, Standalone: **0.8**.
+Dokumentationsstand: **0.40 vom 24.09.2026**. PC-Bedienfeld: **0.7.3**, Firmware: **0.7.0**, Standalone: **0.8**.
 
 ## Live-LCD-Anzeige (0.6.0)
 
